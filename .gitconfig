@@ -1,3 +1,26 @@
 [user]
-	email = james.bonello@braincreators.com
-	name = mesllo
+	email = bonl+github@eigenclave.xyz
+	name = bonl
+
+[core]
+    editor = nvim
+    autocrlf = input
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[push]
+    autoSetupRemote = true
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+    lg = log --oneline --graph --decorate
+
+[includeIf "gitdir:~/dev/braincreators/"]
+    path = ~/.gitconfig.work

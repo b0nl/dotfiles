@@ -1,3 +1,5 @@
+####################### GENERAL OPS #######################
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -26,7 +28,7 @@ shopt -s checkwinsize
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 #shopt -s globstar
-
+# eg. ls **/*.py would match Python files in the current directory andall subdirectories
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
@@ -87,20 +89,6 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
@@ -116,21 +104,47 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# add for poetry
-export PATH="$HOME/.local/bin:$PATH"
 
-# dolt
-export DOLT_USER_NAME="mesllo-bc"
-export DOLT_USER_EMAIL="james.bonello@braincreators.com"
+####################### DOTFILE OPS #######################
 
-# export minio for object storage stuff
-export PATH=$PATH:$HOME/minio-binaries/ 
+use-work() {
+  echo work > "$HOME/.dotfiles-profile"
+  export DOTFILES_PROFILE=work
+  source "$HOME/.bashrc"
+}
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# detect profile
+if [ -f "$HOME/.dotfiles-profile" ]; then
+  read -r DOTFILES_PROFILE < "$HOME/.dotfiles-profile"
+else
+  DOTFILES_PROFILE="work"
+fi
+
+export DOTFILES_PROFILE
+
+# load profile-specific file and load its environment-specific additions
+case "$DOTFILES_PROFILE" in
+  work)
+    [ -f "$HOME/.bashrc.work" ] && . "$HOME/.bashrc.work"
+    ;;
+esac
+
+# always load local untracked overrides last
+[ -f "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
+
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
+
+
+####################### DEV OPS #######################
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-export PATH="$HOME/.nvm/versions/node/$(nvm version)/bin:$PATH"
+
 . "$HOME/.cargo/env"
-export PATH="$HOME/.cargo/bin:$PATH"
+
+
+####################### CODE OPS #######################
+
+export EDITOR=nvim
+export VISUAL=nvim
