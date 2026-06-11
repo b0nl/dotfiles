@@ -107,32 +107,10 @@ fi
 
 ####################### DOTFILE OPS #######################
 
-dotfiles() {
-  /usr/bin/git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" "$@"
-}
-
-dotfiles-audit() {
-  dotfiles status --short --untracked-files=all \
-    | grep '^??' \
-    | sed 's/^?? //' \
-    | grep -Ev '^(\.cache/|\.local/|\.mozilla/|\.thunderbird/|\.npm/|\.cargo/|\.rustup/|\.ssh/|\.aws/|\.gnupg/|\.pki/|\.docker/|\.dotnet/|\.android/|\.config/google-chrome/|\.config/chromium/|\.config/discord/|\.config/spotify/|Downloads/|Documents/|Pictures/|Videos/|Music/|dev/|mlpipeline/|dolt_repos/)' \
-    | sort
-}
-
-dotfiles-audit-all() {
-  dotfiles status --short --untracked-files=all
-}
-
-dotfiles-untracked() {
-  /usr/bin/git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" status --short --untracked-files=all
-}
-
-dotfiles-pick() {
-  dotfiles-audit | fzf -m | while read -r file; do
-    dotfiles add "$file"
-    echo "Added: $file"
-  done
-}
+# Dotfiles helpers
+if [ -f "$HOME/.config/dotfiles/shell/dotfiles.sh" ]; then
+  . "$HOME/.config/dotfiles/shell/dotfiles.sh"
+fi
 
 use-work() {
   echo work > "$HOME/.dotfiles-profile"
