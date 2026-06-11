@@ -24,3 +24,6 @@
 
 [includeIf "gitdir:~/dev/braincreators/"]
     path = ~/.gitconfig.work
+
+[color]
+	ui = auto
