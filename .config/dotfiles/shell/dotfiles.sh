@@ -53,10 +53,6 @@ dotfiles-audit-all() {
   dotfiles status --short --untracked-files=all
 }
 
-dotfiles-untracked() {
-  /usr/bin/git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" status --short --untracked-files=all
-}
-
 # ------------------------------------------------------------
 # Interactive add helper
 # ------------------------------------------------------------
@@ -72,16 +68,4 @@ dotfiles-pick() {
     dotfiles add "$file"
     echo "Added: $file"
   done
-}
-
-# ------------------------------------------------------------
-# Save helper
-# ------------------------------------------------------------
-
-dotfiles-save() {
-  local msg="${1:-update dotfiles}"
-
-  dotfiles status -sb
-  dotfiles commit -m "$msg"
-  dotfiles push
 }
