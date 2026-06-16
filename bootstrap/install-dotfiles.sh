@@ -4,6 +4,7 @@ set -euo pipefail
 REPO_URL="git@github.com:b0nl/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.dotfiles-backup"
+DOTFILES_PACKAGES_DIR="$HOME/.config/dotfiles/packages"
 
 echo "==> Installing dotfiles"
 
@@ -107,3 +108,23 @@ echo "    source ~/.bashrc"
 echo
 echo "==> Current status:"
 dotfiles status -sb
+
+# ------------------------------------------------------------
+# Package manifest helpers
+# ------------------------------------------------------------
+
+packages-edit() {
+  mkdir -p "$DOTFILES_PACKAGES_DIR"
+
+  if command -v code >/dev/null 2>&1; then
+    code \
+      "$DOTFILES_PACKAGES_DIR/apt-base.txt" \
+      "$DOTFILES_PACKAGES_DIR/apt-work.txt" \
+      "$DOTFILES_PACKAGES_DIR/apt-personal.txt" \
+      "$DOTFILES_PACKAGES_DIR/snap-base.txt" \
+      "$DOTFILES_PACKAGES_DIR/snap-work.txt" \
+      "$DOTFILES_PACKAGES_DIR/snap-personal.txt"
+  else
+    ${EDITOR:-nano} "$DOTFILES_PACKAGES_DIR/apt-base.txt"
+  fi
+}
