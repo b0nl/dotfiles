@@ -1,5 +1,5 @@
 # dolt
-export DOLT_USER_NAME="mesllo-bc"
+export DOLT_USER_NAME="jbon"
 export DOLT_USER_EMAIL="james.bonello@braincreators.com"
 
 # export minio for object storage stuff

@@ -1,0 +1,5 @@
+chromium-browser
+code --classic
+proton-authenticator
+spotify
+vlc

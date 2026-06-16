@@ -12,16 +12,18 @@ dotfiles() {
 # Dotfiles aliases
 # ------------------------------------------------------------
 
-alias df='dotfiles status -sb'
-alias dfs='dotfiles status'
-alias dfd='dotfiles diff'
-alias dfdt='dotfiles difftool'
-alias dfn='dotfiles diff --name-only'
-alias dfstat='dotfiles diff --stat'
-alias dfa='dotfiles add'
-alias dfc='dotfiles commit'
-alias dfp='dotfiles push'
-alias dfl='dotfiles log --oneline --graph --decorate'
+alias dots='dotfiles status'
+alias dotsb='dotfiles status -sb'
+alias dotsd='dotfiles diff'
+alias dotsdt='dotfiles difftool'
+alias dotsn='dotfiles diff --name-only'
+alias dotsstat='dotfiles diff --stat'
+alias dotsa='dotfiles add'
+alias dotsc='dotfiles commit'
+alias dotsp='dotfiles push'
+alias dotsl='dotfiles log --oneline --graph --decorate'
+alias dotsu='dotfiles-audit'
+alias dotsua='dotfiles-audit-all'
 
 # ------------------------------------------------------------
 # Dotfiles local Git configuration
@@ -43,10 +45,9 @@ dotfiles-ensure-config() {
 
 dotfiles-audit() {
   dotfiles status --short --untracked-files=all \
-    | grep '^??' \
-    | sed 's/^?? //' \
+    | awk '/^\?\?/ {sub(/^\?\? /, ""); print}' \
     | grep -Ev '^(\.cache/|\.local/|\.mozilla/|\.thunderbird/|\.npm/|\.cargo/|\.rustup/|\.ssh/|\.aws/|\.gnupg/|\.pki/|\.docker/|\.dotnet/|\.android/|\.config/google-chrome/|\.config/chromium/|\.config/discord/|\.config/spotify/|Downloads/|Documents/|Pictures/|Videos/|Music/|dev/|mlpipeline/|dolt_repos/)' \
-    | sort
+    | sort || true
 }
 
 dotfiles-audit-all() {
