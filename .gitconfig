@@ -22,7 +22,7 @@
     ci = commit
     lg = log --oneline --graph --decorate
 
-[includeIf "gitdir:~/dev/braincreators/"]
+[includeIf "gitdir:~/dev/work/"]
     path = ~/.gitconfig.work
 
 [color]
