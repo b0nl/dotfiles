@@ -1,0 +1,21 @@
+# OS/editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local env/secrets
+.env
+.env.*
+*.local
+
+# Logs
+*.log

@@ -1,9 +1,10 @@
 [user]
 	email = bonl+github@eigenclave.xyz
-	name = bonl
+	name = b0nl
 
 [core]
-    editor = nvim
+    editor = code --wait
+    excludesfile = ~/.gitignore_global
     autocrlf = input
 
 [init]
@@ -15,15 +16,16 @@
 [push]
     autoSetupRemote = true
 
+[color]
+	ui = auto
+
 [alias]
     st = status
     co = checkout
     br = branch
     ci = commit
     lg = log --oneline --graph --decorate
+    last = log -1 HEAD --stat
 
 [includeIf "gitdir:~/dev/work/"]
     path = ~/.gitconfig.work
-
-[color]
-	ui = auto
