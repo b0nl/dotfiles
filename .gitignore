@@ -1,2 +1,16 @@
-.dotfiles
+# dotfiles repo internals
+.dotfiles/
+
+# local machine/profile files
 .gitconfig.work
+
+# secrets / dangerous directories
+.ssh/
+.aws/
+.gnupg/
+.kube/
+.pki/
+
+# cache / state
+.cache/
+.local/share/
