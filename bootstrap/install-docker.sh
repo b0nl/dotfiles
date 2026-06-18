@@ -56,10 +56,15 @@ echo "==> Adding current user to docker group"
 
 sudo usermod -aG docker "$USER"
 
-echo "==> Enabling Docker service"
+echo "==> Starting/enabling Docker service if systemd is available"
 
-sudo systemctl enable docker >/dev/null 2>&1 || true
-sudo systemctl start docker >/dev/null 2>&1 || true
+if command -v systemctl >/dev/null 2>&1 && systemctl is-system-running >/dev/null 2>&1; then
+  sudo systemctl enable docker
+  sudo systemctl start docker
+else
+  echo "==> systemd is not available or not running; skipping Docker service enable/start"
+  echo "==> You may need to start Docker manually, or use Docker Desktop if this is WSL"
+fi
 
 echo
 echo "==> Docker installation complete"

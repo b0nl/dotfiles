@@ -7,5 +7,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 "$SCRIPT_DIR/install-apt.sh"
 "$SCRIPT_DIR/install-snap.sh"
 "$SCRIPT_DIR/install-uv.sh"
+"$SCRIPT_DIR/install-docker.sh"
 
 echo "==> Full install complete"
