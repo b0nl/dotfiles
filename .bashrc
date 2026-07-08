@@ -139,3 +139,9 @@ esac
 if [ -f "$HOME/.config/dotfiles/shell/vscode.sh" ]; then
   . "$HOME/.config/dotfiles/shell/vscode.sh"
 fi
+
+####################### HEALTH OPS #######################
+
+if [ -f "$HOME/.config/dotfiles/shell/health.sh" ]; then
+  . "$HOME/.config/dotfiles/shell/health.sh"
+fi
