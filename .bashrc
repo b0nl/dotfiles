@@ -134,15 +134,8 @@ case "$DOTFILES_PROFILE" in
     ;;
 esac
 
-# always load local untracked overrides last
-[ -f "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
+####################### VSCODE OPS #######################
 
-
-####################### DEV OPS #######################
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
-
-# Rust / Cargo
-[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+if [ -f "$HOME/.config/dotfiles/shell/vscode.sh" ]; then
+  . "$HOME/.config/dotfiles/shell/vscode.sh"
+fi

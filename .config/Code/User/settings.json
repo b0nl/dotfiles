@@ -8,7 +8,6 @@
     "claudeCode.preferredLocation": "panel",
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "charliermarsh.ruff",
-    "editor.autoIndentOnPaste": true,
     "editor.inlayHints.padding": true,
     "editor.mouseWheelZoom": true,
     "editor.aiStats.enabled": true,
@@ -16,6 +15,26 @@
     "files.autoSave": "afterDelay",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/.venv": true,
+        "**/venv": true
+    },
+    "search.exclude": {
+        "**/.venv": true,
+        "**/venv": true,
+        "**/.git": true,
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true
+    },
     "workbench.preferredHighContrastColorTheme": "Dark 2026",
     "workbench.editor.showTabIndex": true,
     "workbench.settings.openDefaultKeybindings": true,
@@ -33,7 +52,10 @@
     "git.showPushSuccessNotification": true,
     "github.gitProtocol": "ssh",
     "jupyter.showVariableViewWhenDebugging": true,
+    "jupyter.askForKernelRestart": false,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.testing.pytestEnabled": true,
+    "ruff.enable": true,
     "autoDocstring.includeName": true,
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
