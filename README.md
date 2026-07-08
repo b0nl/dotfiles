@@ -199,11 +199,18 @@ dotfiles push
 Depending on the shell helper aliases currently enabled, shorter aliases may also exist, such as:
 
 ```bash
-dots
-dotsd
-dotsdt
-dotsu
-dotsua
+dots='dotfiles status'
+dotsb='dotfiles status -sb'
+dotsd='dotfiles diff'
+dotsdt='dotfiles difftool'
+dotsn='dotfiles diff --name-only'
+dotsstat='dotfiles diff --stat'
+dotsa='dotfiles add'
+dotsc='dotfiles commit'
+dotsp='dotfiles push'
+dotsl='dotfiles log --oneline --graph --decorate'
+dotsu='dotfiles-audit'
+dotsua='dotfiles-audit-all'
 ```
 
 Avoid using `df` as a dotfiles alias because `df` is already a standard Unix command for disk usage.

@@ -2,9 +2,11 @@ anthropic.claude-code
 charliermarsh.ruff
 eamodio.gitlens
 github.remotehub
+gruntfuggly.todo-tree
 guichina.code-telescope
 janisdd.vscode-edit-csv
 jinsihou.diff-tool
+johnpapa.vscode-peacock
 joshmu.periscope
 ms-azuretools.vscode-containers
 ms-python.debugpy
@@ -27,3 +29,11 @@ ms-vscode-remote.remote-ssh
 ms-vscode-remote.remote-ssh-edit
 ms-vscode.remote-repositories
 njpwerner.autodocstring
+redhat.vscode-yaml
+sleistner.vscode-fileutils
+streetsidesoftware.code-spell-checker
+tamasfe.even-better-toml
+timonwong.shellcheck
+usernamehw.errorlens
+vspacecode.whichkey
+yzhang.markdown-all-in-one
