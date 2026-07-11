@@ -5,12 +5,26 @@
 .gitconfig.work
 
 # secrets / dangerous directories
+.cert/
 .ssh/
 .aws/
 .gnupg/
 .kube/
 .pki/
+*.ovpn
 
 # cache / state
+.bash_history
+.sudo_as_admin_successful
 .cache/
 .local/share/
+.lesshst
+~/.mozilla/
+~/.thunderbird/
+~/.npm/
+~/.cargo/registry/
+~/.rustup/
+~/.docker/
+~/.config/google-chrome/
+~/.config/spotify/
+~/.config/discord/
