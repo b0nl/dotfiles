@@ -9,5 +9,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 "$SCRIPT_DIR/install-uv.sh"
 "$SCRIPT_DIR/install-docker.sh"
 "$SCRIPT_DIR/install-vscode.sh"
+"$SCRIPT_DIR/install-gnome.sh"
 
 echo "==> Full install complete"

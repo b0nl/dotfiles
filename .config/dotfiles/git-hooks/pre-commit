@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOTFILES_GIT_DIR="$HOME/.dotfiles"
+DOTFILES_WORK_TREE="$HOME"
+
+dotfiles_git() {
+  git --git-dir="$DOTFILES_GIT_DIR" --work-tree="$DOTFILES_WORK_TREE" "$@"
+}
+
+echo "==> Sorting package manifests"
+
+sort_manifest() {
+  local rel="$1"
+  local file="$DOTFILES_WORK_TREE/$rel"
+
+  [ -f "$file" ] || return 0
+
+  local tmp
+  tmp="$(mktemp)"
+
+  {
+    grep -E '^[[:space:]]*(#|$)' "$file" || true
+    grep -Ev '^[[:space:]]*(#|$)' "$file" | sort -u || true
+  } > "$tmp"
+
+  if ! cmp -s "$file" "$tmp"; then
+    mv "$tmp" "$file"
+    echo "==> Sorted $rel"
+    dotfiles_git add "$rel"
+  else
+    rm "$tmp"
+  fi
+}
+
+for manifest in \
+  ".config/dotfiles/packages/apt-base.txt" \
+  ".config/dotfiles/packages/apt-work.txt" \
+  ".config/dotfiles/packages/apt-personal.txt" \
+  ".config/dotfiles/packages/snap-base.txt" \
+  ".config/dotfiles/packages/snap-work.txt" \
+  ".config/dotfiles/packages/snap-personal.txt"
+do
+  sort_manifest "$manifest"
+done
