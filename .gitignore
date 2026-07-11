@@ -28,3 +28,7 @@
 ~/.config/google-chrome/
 ~/.config/spotify/
 ~/.config/discord/
+
+# Zotero profile, database, attachments, and local state
+.zotero/
+Zotero/

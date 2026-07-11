@@ -47,7 +47,7 @@ dotfiles-health() {
 
   health_section "Core commands"
 
-  for cmd in git curl uv docker code; do
+  for cmd in git curl uv docker code zotero; do
     if command -v "$cmd" >/dev/null 2>&1; then
       health_ok "$cmd -> $(command -v "$cmd")"
     else
