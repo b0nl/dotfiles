@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # dolt
 export DOLT_USER_NAME="jbon"
 export DOLT_USER_EMAIL="james.bonello@braincreators.com"

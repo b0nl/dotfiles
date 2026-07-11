@@ -6,13 +6,12 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "chat.viewSessions.orientation": "stacked",
     "claudeCode.preferredLocation": "panel",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.inlayHints.padding": true,
     "editor.mouseWheelZoom": true,
     "editor.aiStats.enabled": true,
     "diffEditor.codeLens": true,
-    "files.autoSave": "afterDelay",
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
     "files.exclude": {
@@ -74,5 +73,6 @@
         "scrollRight": "ctrl+l",
         "promptDelete": "backspace"
     },
-    "markdown.extension.preview.autoShowPreviewToSide": true
+    "todo-tree.ripgrep.ripgrep": "/usr/bin/rg",
+    "redhat.telemetry.enabled": false
 }
