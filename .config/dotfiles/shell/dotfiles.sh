@@ -1,4 +1,4 @@
-# ~/.config/dotfiles/shell/dotfiles.sh
+#!/bin/bash
 
 # ------------------------------------------------------------
 # Dotfiles Git helper
@@ -31,6 +31,7 @@ alias dotsua='dotfiles-audit-all'
 
 dotfiles-ensure-config() {
   dotfiles config --local status.showUntrackedFiles no
+  dotfiles config --local core.hooksPath "$HOME/.config/dotfiles/git-hooks"
 
   if command -v code >/dev/null 2>&1; then
     dotfiles config --local diff.tool vscode

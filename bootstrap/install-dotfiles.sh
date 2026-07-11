@@ -82,6 +82,7 @@ fi
 echo "==> Configuring dotfiles Git settings"
 
 dotfiles config --local status.showUntrackedFiles no
+dotfiles config --local core.hooksPath "$HOME/.config/dotfiles/git-hooks"
 
 # VSCode difftool support
 if command -v code >/dev/null 2>&1; then
