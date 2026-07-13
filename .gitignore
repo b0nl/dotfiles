@@ -19,15 +19,15 @@
 .cache/
 .local/share/
 .lesshst
-~/.mozilla/
-~/.thunderbird/
-~/.npm/
-~/.cargo/registry/
-~/.rustup/
-~/.docker/
-~/.config/google-chrome/
-~/.config/spotify/
-~/.config/discord/
+.mozilla/
+.thunderbird/
+.npm/
+.cargo/registry/
+.rustup/
+.docker/
+.config/google-chrome/
+.config/spotify/
+.config/discord/
 
 # Zotero profile, database, attachments, and local state
 .zotero/

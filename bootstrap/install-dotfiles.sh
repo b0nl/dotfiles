@@ -93,15 +93,6 @@ else
   echo "==> VSCode CLI 'code' not found; skipping VSCode difftool config"
 fi
 
-# ------------------------------------------------------------
-# Set default profile if missing
-# ------------------------------------------------------------
-
-if [ ! -f "$HOME/.dotfiles-profile" ]; then
-  echo "==> Creating default dotfiles profile: personal"
-  echo "personal" > "$HOME/.dotfiles-profile"
-fi
-
 echo
 echo "==> Dotfiles installation complete"
 echo "==> Reload your shell with:"

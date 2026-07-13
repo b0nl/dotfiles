@@ -42,13 +42,15 @@ fi
 echo "==> Installing base snap packages"
 install_snap_packages "$PACKAGES_DIR/snap-base.txt"
 
-DOTFILES_PROFILE="${DOTFILES_PROFILE:-personal}"
+DOTFILES_MACHINE="${DOTFILES_MACHINE:-$(
+  /usr/bin/git \
+    --git-dir="$HOME/.dotfiles" \
+    config --local --get dotfiles.machine 2>/dev/null || true
+)}"
 
-if [ -f "$HOME/.dotfiles-profile" ]; then
-  read -r DOTFILES_PROFILE < "$HOME/.dotfiles-profile"
-fi
+DOTFILES_MACHINE="${DOTFILES_MACHINE:-personal}"
 
-case "$DOTFILES_PROFILE" in
+case "$DOTFILES_MACHINE" in
   work)
     echo "==> Installing work snap packages"
     install_snap_packages "$PACKAGES_DIR/snap-work.txt"
@@ -58,7 +60,7 @@ case "$DOTFILES_PROFILE" in
     install_snap_packages "$PACKAGES_DIR/snap-personal.txt"
     ;;
   *)
-    echo "==> Unknown DOTFILES_PROFILE=$DOTFILES_PROFILE; skipping profile snap packages"
+    echo "==> Unknown DOTFILES_MACHINE=$DOTFILES_MACHINE; skipping machine-specific snap packages"
     ;;
 esac
 

@@ -31,13 +31,15 @@ sudo apt update
 echo "==> Installing base apt packages"
 install_apt_packages "$PACKAGES_DIR/apt-base.txt"
 
-DOTFILES_PROFILE="${DOTFILES_PROFILE:-personal}"
+DOTFILES_MACHINE="${DOTFILES_MACHINE:-$(
+  /usr/bin/git \
+    --git-dir="$HOME/.dotfiles" \
+    config --local --get dotfiles.machine 2>/dev/null || true
+)}"
 
-if [ -f "$HOME/.dotfiles-profile" ]; then
-  read -r DOTFILES_PROFILE < "$HOME/.dotfiles-profile"
-fi
+DOTFILES_MACHINE="${DOTFILES_MACHINE:-personal}"
 
-case "$DOTFILES_PROFILE" in
+case "$DOTFILES_MACHINE" in
   work)
     echo "==> Installing work apt packages"
     install_apt_packages "$PACKAGES_DIR/apt-work.txt"
@@ -47,7 +49,7 @@ case "$DOTFILES_PROFILE" in
     install_apt_packages "$PACKAGES_DIR/apt-personal.txt"
     ;;
   *)
-    echo "==> Unknown DOTFILES_PROFILE=$DOTFILES_PROFILE; skipping profile apt packages"
+    echo "==> Unknown DOTFILES_MACHINE=$DOTFILES_MACHINE; skipping machine-specific apt packages"
     ;;
 esac
 

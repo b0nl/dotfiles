@@ -66,6 +66,25 @@ else
   echo "==> You may need to start Docker manually, or use Docker Desktop if this is WSL"
 fi
 
+DOTFILES_MACHINE="${DOTFILES_MACHINE:-$(
+  /usr/bin/git \
+    --git-dir="$HOME/.dotfiles" \
+    config --local --get dotfiles.machine 2>/dev/null || true
+)}"
+
+if [ "$DOTFILES_MACHINE" = "work" ]; then
+  DOCKER_CONFIG_FILE="$HOME/.docker/config.json"
+  WORK_REGISTRY="hub.braincreators.com"
+
+  if [ -f "$DOCKER_CONFIG_FILE" ] &&
+     grep -Fq "\"$WORK_REGISTRY\"" "$DOCKER_CONFIG_FILE"; then
+    echo "==> Docker credentials already configured for $WORK_REGISTRY"
+  else
+    echo "==> Logging in to work Docker registry"
+    docker login "$WORK_REGISTRY"
+  fi
+fi
+
 echo
 echo "==> Docker installation complete"
 echo "==> Docker version:"

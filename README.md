@@ -1,111 +1,41 @@
 # Dotfiles
 
-Personal dotfiles and machine bootstrap setup.
+Reproducible Ubuntu/Debian workstation setup based on a bare Git repository.
 
-This repository is designed to make a fresh Ubuntu/Debian-like development machine feel familiar quickly. It tracks shell configuration, Git configuration, package manifests, VSCode configuration, GNOME settings, bootstrap scripts, and helper functions.
+The bare repository is stored at:
 
-The setup uses a **bare Git repository** stored at:
-
-```bash
+```text
 ~/.dotfiles
 ```
 
-with the home directory as the work tree:
+The Git work tree is the home directory:
 
-```bash
+```text
 $HOME
 ```
 
-That means the repo directly tracks files in `$HOME`, such as:
+This setup intentionally uses plain Git and Bash rather than Stow or chezmoi.
 
-```text
-~/.bashrc
-~/.bashrc.work
-~/.gitconfig
-~/.gitignore
-~/.gitignore_global
-~/.tmux.conf
-~/.config/Code/User/settings.json
-~/.config/dotfiles/...
-~/bootstrap/...
-```
+## Dotfiles command
 
-No symlink manager is used.
-
----
-
-## Goals
-
-This setup aims to provide:
-
-* reproducible shell configuration
-* reproducible Git configuration
-* package manifests for apt and snap
-* bootstrap scripts for system setup
-* VSCode settings, keybindings, and extensions
-* GNOME/dconf settings export and restore
-* helper commands for day-to-day dotfiles management
-* a health check for validating the local setup
-* a safer Git workflow for a home-directory dotfiles repo
-
-This repo tracks **intentional configuration**, not the entire state of a machine.
-
-Do not treat this as a full home-directory backup.
-
----
-
-## Target platform
-
-The current bootstrap setup mainly targets:
-
-```text
-Ubuntu / Debian-like Linux systems
-```
-
-Some parts may work on WSL or other Linux distributions, but the apt, snap, Docker, and GNOME scripts are Ubuntu/Debian-oriented.
-
-This repo does not currently aim to support macOS, Fedora, Arch, or Windows directly.
-
----
-
-## Important warning
-
-Because this repo uses `$HOME` as the Git work tree, commands such as this are dangerous:
+The main helper is:
 
 ```bash
-dotfiles add .
-dotfiles add -A
+dotfiles() {
+  /usr/bin/git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" "$@"
+}
 ```
 
-From your home directory, those commands mean:
-
-```text
-Add everything under $HOME that is not ignored.
-```
-
-That can accidentally stage secrets, VPN configs, app state, browser files, SSH metadata, or other private files.
-
-Prefer explicit adds:
+After the shell configuration has loaded, use `dotfiles` like a normal Git command:
 
 ```bash
-dotfiles add .gitconfig
-dotfiles add .config/Code/User/settings.json
-dotfiles add bootstrap/install-uv.sh
+dotfiles status
+dotfiles diff
+dotfiles log --oneline
+dotfiles push
 ```
-
-For already-tracked files, this is safer:
-
-```bash
-dotfiles add -u
-```
-
-That stages modifications/deletions to tracked files only. It does not add new untracked files.
-
----
 
 ## Repository layout
-
-Main structure:
 
 ```text
 .
@@ -133,18 +63,18 @@ Main structure:
     │   └── User/
     │       ├── extensions.txt
     │       ├── keybindings.json
-    │       └── settings.json
+    │       ├── settings.json
+    │       └── snippets/
     └── dotfiles/
         ├── git-hooks/
         │   └── pre-commit
         ├── gnome/
         │   ├── save.sh
         │   ├── apply.sh
-        │   └── configs/
+        │   └── terminal/
         │       ├── profiles.dconf
-        │       ├── desktop-interface.dconf
-        │       ├── wm-keybindings.dconf
-        │       └── media-keys.dconf
+        │       ├── save.sh
+        │       └── apply.sh
         ├── packages/
         │   ├── apt-base.txt
         │   ├── apt-work.txt
@@ -158,153 +88,124 @@ Main structure:
             └── health.sh
 ```
 
----
+GNOME Terminal configuration belongs under:
 
-## Fresh machine install
+```text
+~/.config/dotfiles/gnome/terminal/
+```
 
-### 1. Install minimum prerequisites
+## Fresh machine installation
 
-On a fresh Ubuntu/Debian-like machine:
+Install the minimum prerequisites:
 
 ```bash
 sudo apt update
 sudo apt install -y git curl
 ```
 
-If using the SSH remote, make sure the machine has a GitHub SSH key configured before cloning:
-
-```bash
-ssh -T git@github.com
-```
-
-The repo remote currently assumes:
-
-```text
-git@github.com:b0nl/dotfiles.git
-```
-
-If SSH is not set up yet, either configure SSH first or temporarily clone with HTTPS.
-
----
-
-### 2. Clone the bare repo
+Clone the repository as a bare Git repository:
 
 ```bash
 git clone --bare git@github.com:b0nl/dotfiles.git "$HOME/.dotfiles"
 ```
 
----
-
-### 3. Check out the work tree
+Check out the work tree:
 
 ```bash
 git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" checkout
 ```
 
-If checkout fails because existing files would be overwritten, back them up first. For example:
-
-```bash
-mkdir -p "$HOME/.dotfiles-backup"
-
-mv "$HOME/.bashrc" "$HOME/.dotfiles-backup/.bashrc" 2>/dev/null || true
-mv "$HOME/.gitconfig" "$HOME/.dotfiles-backup/.gitconfig" 2>/dev/null || true
-```
-
-Then retry:
-
-```bash
-git --git-dir="$HOME/.dotfiles" --work-tree="$HOME" checkout
-```
-
----
-
-### 4. Run the main bootstrap
-
-After checkout:
+Run the complete bootstrap:
 
 ```bash
 ~/bootstrap/install.sh
 ```
 
-The top-level installer runs the individual installers in order:
-
-```bash
-~/bootstrap/install-dotfiles.sh
-~/bootstrap/install-apt.sh
-~/bootstrap/install-snap.sh
-~/bootstrap/install-uv.sh
-~/bootstrap/install-docker.sh
-~/bootstrap/install-vscode.sh
-~/bootstrap/install-gnome.sh
-```
-
----
-
-### 5. Reload the shell
+Reload Bash and run the health check:
 
 ```bash
 source ~/.bashrc
-```
-
-Then check the installation:
-
-```bash
 dotfiles-health
-dotfiles status -sb
 ```
 
----
+### Checkout conflicts
 
-## The `dotfiles` command
+A fresh machine may already contain files such as `.bashrc` or `.profile`.
 
-The main helper function is:
-
-```bash
-dotfiles
-```
-
-It is defined in:
+Back conflicting files up under:
 
 ```text
-~/.config/dotfiles/shell/dotfiles.sh
+~/.dotfiles-backup/
 ```
 
-It is equivalent to:
+Then retry the checkout.
+
+Do not delete conflicting files until the backup has been checked.
+
+## Machine type
+
+The bootstrap asks once whether the computer is a work laptop.
+
+The selected value is stored in the local configuration of the bare repository:
 
 ```bash
-git --git-dir="$HOME/.dotfiles" --work-tree="$HOME"
+dotfiles config --local dotfiles.machine work
 ```
 
-Common commands:
+or:
 
 ```bash
-dotfiles status -sb
-dotfiles diff
-dotfiles add .gitconfig
-dotfiles commit -m "Update git config"
-dotfiles push
+dotfiles config --local dotfiles.machine personal
 ```
 
-Aliases may also be available:
+Inspect the current value with:
 
 ```bash
-dots       # dotfiles status
-dotsb      # dotfiles status -sb
-dotsd      # dotfiles diff
-dotsdt     # dotfiles difftool
-dotsn      # dotfiles diff --name-only
-dotsstat   # dotfiles diff --stat
-dotsa      # dotfiles add
-dotsc      # dotfiles commit
-dotsp      # dotfiles push
-dotsl      # dotfiles log --oneline --graph --decorate
-dotsu      # dotfiles-audit
-dotsua     # dotfiles-audit-all
+dotfiles config --local --get dotfiles.machine
 ```
 
-The alias `df` is intentionally avoided because `df` is already a standard Unix command.
+The value is stored in:
 
----
+```text
+~/.dotfiles/config
+```
+
+It is local to the current computer. It is not tracked or pushed.
+
+The prompt is skipped when `dotfiles.machine` is already configured.
+
+For a non-interactive installation, set the value explicitly:
+
+```bash
+DOTFILES_MACHINE=work ~/bootstrap/install.sh
+```
+
+or:
+
+```bash
+DOTFILES_MACHINE=personal ~/bootstrap/install.sh
+```
+
+### Work machines
+
+A work installation:
+
+- installs the base and work package manifests;
+- loads `~/.bashrc.work`;
+- installs `kubectl`;
+- installs Docker;
+- adds the current user to the `docker` group;
+- prompts for Docker registry authentication to `hub.your-work.com`.
+
+### Personal machines
+
+A personal installation:
+
+- installs the base and personal package manifests;
+- does not load a separate personal Bash file;
+- skips work-only bootstrap actions.
+
+There is currently no `.bashrc.local` layer.
 
 ## Shell setup
 
@@ -314,302 +215,44 @@ The main Bash entrypoint is:
 ~/.bashrc
 ```
 
-It handles normal Bash setup and then sources dotfiles-specific helper scripts.
-
-Important sourced helper files:
+It loads the tracked shell helpers under:
 
 ```text
-~/.config/dotfiles/shell/dotfiles.sh
-~/.config/dotfiles/shell/vscode.sh
-~/.config/dotfiles/shell/health.sh
+~/.config/dotfiles/shell/
 ```
 
-The current profile is controlled by:
+Known helpers:
 
 ```text
-~/.dotfiles-profile
+dotfiles.sh
+vscode.sh
+health.sh
 ```
 
-Example:
-
-```bash
-echo work > ~/.dotfiles-profile
-source ~/.bashrc
-```
-
-The current tracked profile-specific config is:
+When `dotfiles.machine` is set to `work`, Bash also loads:
 
 ```text
 ~/.bashrc.work
 ```
 
-At the moment, the work profile loads `.bashrc.work`. Other profile values can be added later if needed.
-
----
-
-## Local-only shell config
-
-For secrets or machine-specific shell settings, do not commit them directly.
-
-Use local files such as:
-
-```text
-~/.bashrc.local
-~/.bashrc.work.local
-~/.gitconfig.local
-```
-
-These should stay untracked.
-
-Examples of things that belong in local-only files:
+Shell files should be sourced defensively:
 
 ```bash
-export SOME_PRIVATE_TOKEN="..."
-export AWS_PROFILE="..."
-export PRIVATE_API_BASE_URL="..."
+[ -f "$HOME/.config/dotfiles/shell/dotfiles.sh" ] &&
+  . "$HOME/.config/dotfiles/shell/dotfiles.sh"
 ```
-
-Do not commit tokens, certificates, credentials, private hostnames, or VPN configs.
-
----
-
-## Dotfiles helper script
-
-Path:
-
-```text
-~/.config/dotfiles/shell/dotfiles.sh
-```
-
-Provides:
-
-```text
-dotfiles
-dotfiles aliases
-dotfiles-ensure-config
-dotfiles-audit
-dotfiles-audit-all
-dotfiles-pick
-```
-
-### `dotfiles-ensure-config`
-
-Configures local Git settings for the bare dotfiles repo:
-
-```bash
-dotfiles config --local status.showUntrackedFiles no
-dotfiles config --local core.hooksPath "$HOME/.config/dotfiles/git-hooks"
-```
-
-If the VSCode CLI exists, it also configures VSCode as the Git difftool.
-
-Run manually if needed:
-
-```bash
-dotfiles-ensure-config
-```
-
-### `dotfiles-audit`
-
-Shows filtered untracked candidates that might be worth tracking:
-
-```bash
-dotfiles-audit
-```
-
-This hides obvious noise such as caches, browser data, large app state, and project directories.
-
-### `dotfiles-audit-all`
-
-Shows all untracked files:
-
-```bash
-dotfiles-audit-all
-```
-
-This can be very noisy because `$HOME` is the work tree.
-
-### `dotfiles-pick`
-
-Uses `fzf` to interactively select untracked files from the audit list and add them:
-
-```bash
-dotfiles-pick
-```
-
-Requires:
-
-```bash
-fzf
-```
-
----
-
-## Git config
-
-Tracked Git files:
-
-```text
-~/.gitconfig
-~/.gitignore
-~/.gitignore_global
-```
-
-Optional/local-only:
-
-```text
-~/.gitconfig.local
-```
-
-### `.gitconfig`
-
-Contains shared Git settings such as:
-
-```ini
-[core]
-    editor = code --wait
-    excludesfile = ~/.gitignore_global
-    autocrlf = input
-```
-
-Meaning:
-
-```text
-editor = code --wait
-    Use VSCode for Git commit/rebase messages and wait for the editor to close.
-
-excludesfile = ~/.gitignore_global
-    Use ~/.gitignore_global as the global ignore file for all repos.
-
-autocrlf = input
-    Normalize CRLF line endings to LF on commit, but do not convert LF to CRLF on checkout.
-```
-
-### `.gitignore`
-
-This applies to the dotfiles repo itself because the work tree is `$HOME`.
-
-Use it for home-directory-specific ignores, such as:
-
-```text
-.dotfiles/
-.dotfiles-profile
-.gitconfig.local
-.bashrc.local
-.cache/
-.local/
-.ssh/
-.aws/
-.gnupg/
-.kube/
-*.ovpn
-.lesshst
-```
-
-### `.gitignore_global`
-
-This applies to every Git repo on the machine.
-
-Use it for generic local/editor/OS junk:
-
-```text
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-__pycache__/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-*.log
-```
-
-Do not globally ignore `.vscode/` if some projects may intentionally commit `.vscode/tasks.json`, `.vscode/launch.json`, or `.vscode/extensions.json`.
-
----
-
-## Git hooks
-
-Tracked hooks live in:
-
-```text
-~/.config/dotfiles/git-hooks/
-```
-
-Current hook:
-
-```text
-~/.config/dotfiles/git-hooks/pre-commit
-```
-
-The hook sorts package manifests before commits.
-
-It handles:
-
-```text
-.config/dotfiles/packages/apt-base.txt
-.config/dotfiles/packages/apt-work.txt
-.config/dotfiles/packages/apt-personal.txt
-.config/dotfiles/packages/snap-base.txt
-.config/dotfiles/packages/snap-work.txt
-.config/dotfiles/packages/snap-personal.txt
-```
-
-The hook is enabled through local repo config:
-
-```bash
-dotfiles config --local core.hooksPath "$HOME/.config/dotfiles/git-hooks"
-```
-
-This is set by:
-
-```bash
-dotfiles-ensure-config
-```
-
-and by:
-
-```bash
-~/bootstrap/install-dotfiles.sh
-```
-
-If commits appear to stop after printing:
-
-```text
-==> Sorting package manifests
-```
-
-debug the hook with:
-
-```bash
-bash -x ~/.config/dotfiles/git-hooks/pre-commit
-```
-
-Temporary escape hatch:
-
-```bash
-dotfiles commit --no-verify -m "Your message"
-```
-
-Only use `--no-verify` when necessary.
-
----
 
 ## Bootstrap scripts
 
-Bootstrap scripts live in:
+The top-level installer is:
 
 ```text
-~/bootstrap/
+~/bootstrap/install.sh
 ```
 
-### `install.sh`
+It runs the individual installers in this order:
 
-Top-level installer.
-
-Runs the individual installers in order:
-
-```bash
+```text
 install-dotfiles.sh
 install-apt.sh
 install-snap.sh
@@ -619,295 +262,357 @@ install-vscode.sh
 install-gnome.sh
 ```
 
-Run with:
+### `install.sh`
+
+The top-level coordinator:
+
+- runs the dotfiles checkout/configuration step first;
+- reads the existing `dotfiles.machine` value;
+- prompts once when the machine type is not configured;
+- stores the answer in the bare repository's local Git config;
+- exports `DOTFILES_MACHINE` for the remaining installers;
+- runs the installers in order.
+
+Run it with:
 
 ```bash
 ~/bootstrap/install.sh
 ```
 
----
-
 ### `install-dotfiles.sh`
 
-Ensures the bare repo exists and checks it out into `$HOME`.
+Responsible for:
 
-Responsibilities:
+- cloning or reusing the bare repository;
+- checking out the home-directory work tree;
+- backing up conflicting files;
+- setting `status.showUntrackedFiles no`;
+- setting the tracked Git hook path;
+- configuring the VSCode diff tool when `code` is available;
+- ensuring the expected local Git configuration exists.
 
-* checks that Git exists
-* clones the bare repo into `~/.dotfiles` if missing
-* checks out tracked files into `$HOME`
-* backs up checkout conflicts into `~/.dotfiles-backup`
-* configures local dotfiles Git settings
-* sets the dotfiles Git hook path
-* configures VSCode difftool if `code` exists
-* creates a default `~/.dotfiles-profile` if missing
-
-Run manually with:
-
-```bash
-~/bootstrap/install-dotfiles.sh
-```
-
----
+Machine selection is not stored in a separate profile file.
 
 ### `install-apt.sh`
 
-Installs apt packages from curated manifests:
-
-```text
-~/.config/dotfiles/packages/apt-base.txt
-~/.config/dotfiles/packages/apt-work.txt
-~/.config/dotfiles/packages/apt-personal.txt
-```
-
-Behavior:
-
-* always installs `apt-base.txt`
-* reads `~/.dotfiles-profile`
-* installs either work or personal packages depending on the profile
-* skips missing/empty package files
-
-Run manually:
-
-```bash
-~/bootstrap/install-apt.sh
-```
-
----
-
-### `install-snap.sh`
-
-Installs snap packages from curated manifests:
-
-```text
-~/.config/dotfiles/packages/snap-base.txt
-~/.config/dotfiles/packages/snap-work.txt
-~/.config/dotfiles/packages/snap-personal.txt
-```
-
-The snap manifests support package flags.
-
-Example:
-
-```text
-code --classic
-```
-
-Run manually:
-
-```bash
-~/bootstrap/install-snap.sh
-```
-
----
-
-### `install-uv.sh`
-
-Installs `uv` if missing.
-
-Run manually:
-
-```bash
-~/bootstrap/install-uv.sh
-```
-
-To update `uv` later, use:
-
-```bash
-uv self update
-```
-
-The installer intentionally does not auto-update an existing `uv`.
-
----
-
-### `install-docker.sh`
-
-Installs Docker Engine from Docker’s official apt repository.
-
-Responsibilities:
-
-* removes conflicting Docker packages if present
-* installs Docker apt prerequisites
-* adds Docker’s GPG key
-* adds Docker’s apt repository
-* installs:
-
-  * `docker-ce`
-  * `docker-ce-cli`
-  * `containerd.io`
-  * `docker-buildx-plugin`
-  * `docker-compose-plugin`
-* ensures the `docker` group exists
-* adds the current user to the `docker` group
-* starts/enables Docker if systemd is available
-
-Run manually:
-
-```bash
-~/bootstrap/install-docker.sh
-```
-
-After installing Docker, log out and log back in, or run:
-
-```bash
-newgrp docker
-```
-
-Then test:
-
-```bash
-docker run hello-world
-```
-
-On WSL or systems without systemd, service startup may be skipped.
-
----
-
-### `install-vscode.sh`
-
-Installs VSCode extensions listed in:
-
-```text
-~/.config/Code/User/extensions.txt
-```
-
-Run manually:
-
-```bash
-~/bootstrap/install-vscode.sh
-```
-
-This script assumes the `code` CLI already exists. VSCode itself is expected to be installed through snap, apt, or manually before this runs.
-
----
-
-### `install-gnome.sh`
-
-Applies tracked GNOME/dconf settings.
-
-It calls:
-
-```text
-~/.config/dotfiles/gnome/apply.sh
-```
-
-The script skips cleanly if:
-
-* `dconf` is not installed
-* no graphical session is detected
-* the GNOME apply script is missing
-
-Run manually:
-
-```bash
-~/bootstrap/install-gnome.sh
-```
-
----
-
-## Package manifests
-
-Package manifests live in:
+Installs curated apt packages from:
 
 ```text
 ~/.config/dotfiles/packages/
 ```
 
-Apt manifests:
+Behavior:
+
+- always installs `apt-base.txt`;
+- installs `apt-work.txt` when `dotfiles.machine=work`;
+- installs `apt-personal.txt` when `dotfiles.machine=personal`;
+- skips missing, blank, and comment-only lines.
+
+### `install-snap.sh`
+
+Installs curated Snap packages from:
+
+```text
+~/.config/dotfiles/packages/
+```
+
+Behavior:
+
+- always installs `snap-base.txt`;
+- installs `snap-work.txt` when `dotfiles.machine=work`;
+- installs `snap-personal.txt` when `dotfiles.machine=personal`;
+- supports package flags in the manifest.
+
+The work manifest includes:
+
+```text
+kubectl --classic
+```
+
+Verify the installation with:
+
+```bash
+kubectl version --client
+```
+
+Kubernetes credentials and cluster configuration under `~/.kube/` must remain untracked.
+
+### `install-uv.sh`
+
+Installs `uv` when it is missing.
+
+Updating is intentionally manual:
+
+```bash
+uv self update
+```
+
+### `install-docker.sh`
+
+Installs Docker Engine from Docker's official apt repository.
+
+It also:
+
+- ensures the `docker` group exists;
+- adds the current user to the group;
+- enables and starts Docker when systemd is available;
+- prompts work machines to log in to:
+
+```text
+hub.your-work.com
+```
+
+The registry login remains interactive:
+
+```bash
+docker login hub.your-work.com
+```
+
+Passwords and access tokens must never be stored in the bootstrap scripts or committed to the dotfiles repository.
+
+Docker writes local authentication state under:
+
+```text
+~/.docker/
+```
+
+That directory must remain untracked.
+
+Docker group membership normally becomes active after logging out and back in.
+
+For the current shell only, it can be activated with:
+
+```bash
+newgrp docker
+```
+
+Check membership with:
+
+```bash
+id -nG | tr ' ' '\n' | grep -x docker
+```
+
+Membership in the `docker` group grants effectively root-level control over the machine.
+
+### `install-vscode.sh`
+
+Installs extensions listed in:
+
+```text
+~/.config/Code/User/extensions.txt
+```
+
+### `install-gnome.sh`
+
+Applies tracked GNOME configuration only when:
+
+- `dconf` is available;
+- a graphical desktop session is present;
+- the relevant tracked configuration files exist.
+
+It should not blindly apply desktop settings on headless systems.
+
+## Package manifests
+
+Package manifests live under:
+
+```text
+~/.config/dotfiles/packages/
+```
+
+Files:
 
 ```text
 apt-base.txt
 apt-work.txt
 apt-personal.txt
-```
-
-Snap manifests:
-
-```text
 snap-base.txt
 snap-work.txt
 snap-personal.txt
 ```
 
-### Base vs profile-specific packages
+### Base and machine-specific packages
 
-`*-base.txt` files are for packages wanted on every machine.
+`*-base.txt` contains packages wanted on every machine.
 
-`*-work.txt` files are for work-specific packages.
+`*-work.txt` contains work-only packages.
 
-`*-personal.txt` files are for personal-machine extras.
+`*-personal.txt` contains personal-machine packages.
 
-The active profile comes from:
+The active machine type is read with:
+
+```bash
+dotfiles config --local --get dotfiles.machine
+```
+
+Change it manually with:
+
+```bash
+dotfiles config --local dotfiles.machine work
+```
+
+or:
+
+```bash
+dotfiles config --local dotfiles.machine personal
+```
+
+Reload Bash after changing it:
+
+```bash
+source ~/.bashrc
+```
+
+Keep package manifests curated.
+
+Do not track generated package snapshots such as:
 
 ```text
-~/.dotfiles-profile
+apt-manual-current.txt
+apt-after-install-current.txt
+snap-current.txt
 ```
 
-Example:
+## Package manifest hook
 
-```bash
-echo work > ~/.dotfiles-profile
-```
-
----
-
-## Updating package manifests
-
-Edit manifests with:
-
-```bash
-code ~/.config/dotfiles/packages
-```
-
-or use any editor.
-
-The pre-commit hook automatically sorts and deduplicates package manifests.
-
-Manual sort if needed:
-
-```bash
-sort -u ~/.config/dotfiles/packages/apt-base.txt -o ~/.config/dotfiles/packages/apt-base.txt
-```
-
-Commit:
-
-```bash
-dotfiles add .config/dotfiles/packages
-dotfiles commit -m "Update package manifests"
-dotfiles push
-```
-
-### What belongs in manifests?
-
-Good:
+The tracked pre-commit hook is:
 
 ```text
-git
-curl
-fzf
-ripgrep
-shellcheck
-dconf-cli
-tree
-jq
+~/.config/dotfiles/git-hooks/pre-commit
 ```
 
-Avoid listing random dependencies unless you intentionally want them.
+It sorts and deduplicates apt and Snap manifests before commits.
 
-Avoid putting tools here if they have dedicated installers:
+Because the repository is bare, the hook must use the `dotfiles` Git command rather than plain `git add`.
+
+If a commit stops after:
 
 ```text
-Docker -> bootstrap/install-docker.sh
-uv     -> bootstrap/install-uv.sh
-VSCode extensions -> bootstrap/install-vscode.sh
+==> Sorting package manifests
 ```
 
-Generated package snapshot files should not usually be committed.
+debug it with:
 
----
+```bash
+bash -x ~/.config/dotfiles/git-hooks/pre-commit
+```
 
-## VSCode configuration
+Temporary bypass:
+
+```bash
+dotfiles commit --no-verify -m "message"
+```
+
+## Important dotfiles safety rule
+
+Because `$HOME` is the Git work tree, never run these casually from the home directory:
+
+```bash
+dotfiles add .
+dotfiles add -A
+```
+
+They can stage the entire home directory.
+
+For already tracked files, prefer:
+
+```bash
+dotfiles add -u
+```
+
+For new files, add explicit paths:
+
+```bash
+dotfiles add .gitconfig
+dotfiles add bootstrap/install-docker.sh
+dotfiles add .config/dotfiles/shell/health.sh
+```
+
+Before committing:
+
+```bash
+dotfiles diff --cached
+```
+
+## Hidden untracked files
+
+Normal status output hides untracked files:
+
+```bash
+dotfiles config --local status.showUntrackedFiles no
+```
+
+This only changes status display. It does not ignore files.
+
+Audit untracked files with:
+
+```bash
+dotfiles status --short --untracked-files=all
+dotfiles-audit
+dotfiles-audit-all
+```
+
+## Files that must remain untracked
+
+Do not track credentials, private keys, machine state, or application caches.
+
+Examples:
+
+```text
+.dotfiles/
+.dotfiles-backup/
+.gitconfig.local
+.cache/
+.local/
+.ssh/
+.aws/
+.gnupg/
+.kube/
+.docker/
+*.ovpn
+.env
+.env.*
+.lesshst
+```
+
+An OpenVPN file may contain certificates, private keys, credentials, or private endpoints. Inspect it carefully and keep it untracked by default.
+
+## Git configuration
+
+Tracked Git files:
+
+```text
+~/.gitconfig
+~/.gitignore
+~/.gitignore_global
+```
+
+Potential local-only file:
+
+```text
+~/.gitconfig.local
+```
+
+Recommended core settings:
+
+```gitconfig
+[core]
+    editor = code --wait
+    excludesfile = ~/.gitignore_global
+    autocrlf = input
+```
+
+Meaning:
+
+- `editor = code --wait` opens VSCode for Git editing and waits for it to close;
+- `excludesfile = ~/.gitignore_global` applies user-wide ignore rules;
+- `autocrlf = input` normalizes CRLF to LF when committing.
+
+`.gitignore` applies to the bare dotfiles repository's home-directory work tree.
+
+`.gitignore_global` applies to every normal Git repository on the machine.
+
+## VSCode
 
 Tracked VSCode files:
 
@@ -915,161 +620,68 @@ Tracked VSCode files:
 ~/.config/Code/User/settings.json
 ~/.config/Code/User/keybindings.json
 ~/.config/Code/User/extensions.txt
+~/.config/Code/User/snippets/
 ```
 
-Do not track the entire:
+Do not track all of `~/.config/Code`; it contains caches and machine state.
 
-```text
-~/.config/Code/
-```
-
-That directory includes caches, state, backups, and machine-specific data.
-
----
-
-## VSCode helper script
-
-Path:
+VSCode helper functions live in:
 
 ```text
 ~/.config/dotfiles/shell/vscode.sh
 ```
 
-Provides:
-
-```text
-vscode-save-extensions
-vscode-install-extensions
-vscode-edit-settings
-vscode-save-config
-```
-
-### Save installed extensions
-
-```bash
-vscode-save-extensions
-```
-
-Writes:
-
-```text
-~/.config/Code/User/extensions.txt
-```
-
-### Install tracked extensions
-
-```bash
-vscode-install-extensions
-```
-
-Reads:
-
-```text
-~/.config/Code/User/extensions.txt
-```
-
-and installs each extension with:
-
-```bash
-code --install-extension <extension-id>
-```
-
-### Edit VSCode config
-
-```bash
-vscode-edit-settings
-```
-
-Opens:
-
-```text
-settings.json
-keybindings.json
-extensions.txt
-```
-
-### Save VSCode config into dotfiles
+Typical update workflow:
 
 ```bash
 vscode-save-config
-```
-
-This saves the current extension list, stages VSCode config files, and shows dotfiles status.
-
-Typical VSCode update workflow:
-
-```bash
-# Change VSCode settings/extensions normally.
-
-vscode-save-config
+dotfiles add \
+  .config/Code/User/settings.json \
+  .config/Code/User/keybindings.json \
+  .config/Code/User/extensions.txt
+dotfiles diff --cached
 dotfiles commit -m "Update VSCode configuration"
 dotfiles push
 ```
 
----
+Keep global Python settings restrained. Let each repository's `pyproject.toml` define strict linting and type-checking behavior.
 
-## GNOME settings
+A reasonable global baseline is:
 
-GNOME settings live under:
+```json
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "ruff.nativeServer": "on"
+}
+```
+
+## GNOME configuration
+
+GNOME helpers live under:
 
 ```text
 ~/.config/dotfiles/gnome/
 ```
 
-Scripts:
+Useful dconf dumps:
+
+```bash
+dconf dump /org/gnome/desktop/interface/
+dconf dump /org/gnome/desktop/wm/keybindings/
+dconf dump /org/gnome/settings-daemon/plugins/media-keys/
+dconf dump /org/gnome/terminal/legacy/profiles:/
+```
+
+GNOME Terminal profiles are stored beneath:
 
 ```text
-~/.config/dotfiles/gnome/save.sh
-~/.config/dotfiles/gnome/apply.sh
+/org/gnome/terminal/legacy/profiles:/
 ```
 
-Tracked config dumps:
-
-```text
-~/.config/dotfiles/gnome/configs/profiles.dconf
-~/.config/dotfiles/gnome/configs/desktop-interface.dconf
-~/.config/dotfiles/gnome/configs/wm-keybindings.dconf
-~/.config/dotfiles/gnome/configs/media-keys.dconf
-```
-
-These correspond to:
-
-```text
-GNOME Terminal profiles
-GNOME desktop interface settings
-GNOME window manager keybindings
-GNOME media/custom keybindings
-```
-
-### Save current GNOME settings
-
-```bash
-~/.config/dotfiles/gnome/save.sh
-```
-
-Then commit:
-
-```bash
-dotfiles add .config/dotfiles/gnome
-dotfiles commit -m "Update GNOME settings"
-dotfiles push
-```
-
-### Apply tracked GNOME settings
-
-```bash
-~/.config/dotfiles/gnome/apply.sh
-```
-
-or through bootstrap:
-
-```bash
-~/bootstrap/install-gnome.sh
-```
-
-GNOME changes may require restarting GNOME Terminal, logging out/in, or restarting the session before everything appears.
-
----
+The restore process must remain guarded and should not run on headless machines.
 
 ## Health check
 
@@ -1085,16 +697,29 @@ Run:
 dotfiles-health
 ```
 
-It checks:
+The health check verifies:
 
-* dotfiles function availability
-* dotfiles Git status
-* current profile
-* core commands such as `git`, `curl`, `uv`, `docker`, `code`
-* VSCode config files
-* bootstrap script executability
+- the `dotfiles` function;
+- dotfiles Git status;
+- the local `dotfiles.machine` value;
+- core commands such as `git`, `curl`, `uv`, `code`, and `zotero`;
+- Docker installation;
+- Docker group membership;
+- whether the Docker group is active in the current shell;
+- Docker daemon access;
+- `kubectl` on work machines;
+- the current kubectl context;
+- the local Docker login entry for `hub.your-work.com`;
+- tracked VSCode configuration files;
+- bootstrap script executability.
 
-Output uses colors:
+Work-only checks run only when:
+
+```text
+dotfiles.machine = work
+```
+
+Output colors:
 
 ```text
 OK       green
@@ -1103,408 +728,231 @@ WARN     yellow
 sections blue
 ```
 
-Use this after changes or after a fresh-machine bootstrap:
+Run it after bootstrap or after changing shell helpers:
 
 ```bash
 source ~/.bashrc
 dotfiles-health
 ```
 
----
-
-## tmux
-
-This repo tracks:
-
-```text
-~/.tmux.conf
-```
-
-This is only useful if tmux is installed and used.
-
-If tmux is not installed:
+## Important commands
 
 ```bash
-sudo apt install tmux
-```
-
-If tmux is not part of your normal workflow, the config is harmless.
-
----
-
-## Typical daily workflow
-
-Check tracked changes:
-
-```bash
-dotfiles status -sb
-```
-
-View diff:
-
-```bash
-dotfiles diff
-```
-
-Audit possible new config files:
-
-```bash
+dotfiles
+dotfiles-ensure-config
 dotfiles-audit
+dotfiles-audit-all
+dotfiles-pick
+vscode-save-extensions
+vscode-install-extensions
+vscode-edit-settings
+vscode-save-config
+dotfiles-health
 ```
 
-Add specific files:
+If available:
 
 ```bash
-dotfiles add .config/Code/User/settings.json
-dotfiles add .gitconfig
-dotfiles add .config/dotfiles/shell/vscode.sh
+dotfiles-check-scripts
 ```
 
-Commit and push:
+## Validation
+
+Recommended checks:
 
 ```bash
-dotfiles commit -m "Update config"
-dotfiles push
+source ~/.bashrc
+
+bash -n ~/.config/dotfiles/shell/health.sh
+
+shellcheck \
+  ~/bootstrap/*.sh \
+  ~/.config/dotfiles/shell/*.sh
+
+dotfiles-health
+dotfiles status -sb
+dotfiles log --oneline --graph --decorate -10
 ```
-
----
-
-## Adding new files safely
-
-Before tracking a new file, ask:
-
-```text
-Is this config?
-Is this cache?
-Is this app state?
-Is this secret?
-Is this machine-specific?
-```
-
-Good candidates:
-
-```text
-~/.gitconfig
-~/.gitignore_global
-~/.tmux.conf
-~/.config/Code/User/settings.json
-~/.config/Code/User/keybindings.json
-~/.config/Code/User/extensions.txt
-~/.config/dotfiles/...
-~/bootstrap/...
-```
-
-Usually do not track:
-
-```text
-~/.ssh/
-~/.aws/
-~/.gnupg/
-~/.kube/
-~/.docker/
-~/.cache/
-~/.local/share/
-~/.mozilla/
-~/.thunderbird/
-~/.config/google-chrome/
-~/.config/chromium/
-*.ovpn
-.env
-.env.*
-```
-
-If unsure whether a file is ignored:
-
-```bash
-dotfiles check-ignore -v -- <path>
-```
-
-If unsure whether Git sees it:
-
-```bash
-dotfiles status --short --untracked-files=all -- <path>
-```
-
----
 
 ## Troubleshooting
 
-### `dotfiles` command not found
+### Machine type is not configured
 
-Reload shell:
+Check:
+
+```bash
+dotfiles config --local --get dotfiles.machine
+```
+
+Configure a work machine:
+
+```bash
+dotfiles config --local dotfiles.machine work
+```
+
+Configure a personal machine:
+
+```bash
+dotfiles config --local dotfiles.machine personal
+```
+
+Reload Bash:
 
 ```bash
 source ~/.bashrc
 ```
 
-Check helper file exists:
+### Docker group membership is not active
+
+Check the current shell:
 
 ```bash
-ls ~/.config/dotfiles/shell/dotfiles.sh
+id -nG | tr ' ' '\n' | grep -x docker
 ```
 
-Check `.bashrc` is sourcing it.
+Log out and back in.
 
----
-
-### Normal status does not show untracked files
-
-This is intentional:
-
-```bash
-dotfiles config --local status.showUntrackedFiles no
-```
-
-Use:
-
-```bash
-dotfiles-audit
-```
-
-or:
-
-```bash
-dotfiles status --short --untracked-files=all
-```
-
----
-
-### Accidentally staged too much
-
-Inspect staged files:
-
-```bash
-dotfiles diff --cached --name-only
-```
-
-Unstage everything:
-
-```bash
-dotfiles reset
-```
-
-Then add files explicitly.
-
----
-
-### Checkout conflict on fresh machine
-
-Git may refuse to check out files if local files already exist.
-
-Back them up:
-
-```bash
-mkdir -p ~/.dotfiles-backup
-mv ~/.bashrc ~/.dotfiles-backup/.bashrc 2>/dev/null || true
-mv ~/.gitconfig ~/.dotfiles-backup/.gitconfig 2>/dev/null || true
-```
-
-Then retry checkout.
-
-The installer also backs up detected checkout conflicts into:
-
-```text
-~/.dotfiles-backup/
-```
-
----
-
-### `code` command not found
-
-VSCode extensions cannot be installed unless the VSCode CLI exists.
-
-Check:
-
-```bash
-command -v code
-```
-
-If VSCode is installed as a snap, make sure `code --classic` is installed via snap manifest or manually:
-
-```bash
-sudo snap install code --classic
-```
-
-Then rerun:
-
-```bash
-~/bootstrap/install-vscode.sh
-```
-
----
-
-### Docker installed but requires sudo
-
-The installer adds the current user to the `docker` group.
-
-You must log out and log back in, or run:
+For a temporary shell:
 
 ```bash
 newgrp docker
 ```
 
-Then test:
+Then verify:
 
 ```bash
-docker run hello-world
+docker info
 ```
 
----
+### Work Docker registry login is missing
 
-### Docker service does not start
+Run:
 
-On non-systemd systems such as some WSL setups, Docker service startup may be skipped.
+```bash
+docker login hub.your-work.com
+```
+
+Then:
+
+```bash
+dotfiles-health
+```
+
+Do not commit:
+
+```text
+~/.docker/config.json
+```
+
+### kubectl is missing on a work machine
+
+Rerun the Snap installer:
+
+```bash
+~/bootstrap/install-snap.sh
+```
+
+Or install it directly:
+
+```bash
+sudo snap install kubectl --classic
+```
+
+Verify:
+
+```bash
+kubectl version --client
+```
+
+### No kubectl context is configured
 
 Check:
 
 ```bash
-systemctl status docker
+kubectl config current-context
 ```
 
-If using WSL, Docker Desktop integration may be required.
+Kubernetes normally reads configuration from:
 
----
+```text
+~/.kube/config
+```
+
+Obtain the correct kubeconfig through the approved work process.
+
+Do not commit `~/.kube/`.
+
+### VSCode extensions are missing
+
+Run:
+
+```bash
+vscode-install-extensions
+```
+
+or:
+
+```bash
+~/bootstrap/install-vscode.sh
+```
 
 ### GNOME settings do not apply
 
-Check `dconf` exists:
+Confirm that:
+
+- the system has a graphical GNOME session;
+- `dconf` is installed;
+- the tracked dump files exist;
+- the apply script is executable.
+
+Do not force GNOME restoration on a headless system.
+
+## Updating tracked files
+
+Stage only explicit paths:
 
 ```bash
-command -v dconf
+dotfiles add \
+  README.md \
+  .bashrc \
+  .gitignore \
+  bootstrap/install.sh \
+  bootstrap/install-dotfiles.sh \
+  bootstrap/install-apt.sh \
+  bootstrap/install-snap.sh \
+  bootstrap/install-docker.sh \
+  .config/dotfiles/packages/snap-work.txt \
+  .config/dotfiles/shell/health.sh
 ```
 
-Install if missing:
+Review before committing:
 
 ```bash
-sudo apt install dconf-cli
+dotfiles diff --cached
 ```
 
-Apply again:
+Commit and push:
 
 ```bash
-~/.config/dotfiles/gnome/apply.sh
-```
-
-Restart GNOME Terminal or log out/in.
-
----
-
-### Commit only prints package sorting message
-
-Debug the pre-commit hook:
-
-```bash
-bash -x ~/.config/dotfiles/git-hooks/pre-commit
-```
-
-Check hook config:
-
-```bash
-dotfiles config --local core.hooksPath
-```
-
-Expected:
-
-```text
-/home/<user>/.config/dotfiles/git-hooks
-```
-
-Temporary bypass:
-
-```bash
-dotfiles commit --no-verify -m "Your message"
-```
-
----
-
-### GitHub rejects push because of private email
-
-Set the dotfiles repo identity to an allowed email, such as a GitHub noreply email:
-
-```bash
-dotfiles config user.name "b0nl"
-dotfiles config user.email "YOUR_GITHUB_NOREPLY_EMAIL"
-```
-
-Then amend/retry if needed.
-
----
-
-## Maintenance checklist
-
-After changing shell helpers:
-
-```bash
-source ~/.bashrc
-dotfiles-health
-dotfiles add .config/dotfiles/shell
-dotfiles commit -m "Update shell helpers"
+dotfiles commit -m "Add machine-aware work bootstrap"
 dotfiles push
 ```
 
-After changing VSCode:
+Never replace the explicit staging command above with:
 
 ```bash
-vscode-save-config
-dotfiles commit -m "Update VSCode configuration"
-dotfiles push
+dotfiles add .
+dotfiles add -A
 ```
 
-After changing GNOME settings:
+## Deferred improvements
 
-```bash
-~/.config/dotfiles/gnome/save.sh
-dotfiles add .config/dotfiles/gnome
-dotfiles commit -m "Update GNOME settings"
-dotfiles push
-```
+Potential future work:
 
-After changing package manifests:
-
-```bash
-dotfiles add .config/dotfiles/packages
-dotfiles commit -m "Update package manifests"
-dotfiles push
-```
-
-After changing bootstrap scripts:
-
-```bash
-shellcheck ~/bootstrap/*.sh ~/.config/dotfiles/shell/*.sh
-dotfiles add bootstrap .config/dotfiles/shell
-dotfiles commit -m "Update bootstrap scripts"
-dotfiles push
-```
-
----
-
-## Design philosophy
-
-This repo is intentionally simple.
-
-It uses:
-
-```text
-Git
-Bash
-apt
-snap
-dconf
-VSCode CLI
-```
-
-It does not use a dedicated dotfiles manager such as chezmoi or GNU Stow.
-
-The goal is not to track every file in `$HOME`.
-
-The goal is to make a new machine quickly usable by tracking:
-
-* shell behavior
-* Git behavior
-* editor configuration
-* package intent
-* GNOME desktop preferences
-* bootstrap scripts
-* helper functions
-
-Everything else should either be installed from a package manager, recreated from scripts, synced through app accounts, or kept local.
+- test the bootstrap in a fresh Ubuntu VM or WSL installation;
+- add non-Ubuntu operating-system guards if needed;
+- refine GNOME interface and keybinding configuration;
+- add per-project `.vscode/settings.json` or `tasks.json` files where useful;
+- add project-specific `CLAUDE.md` or `.github/copilot-instructions.md`;
+- track sanitized SSH configuration only when it is demonstrably safe;
+- revisit chezmoi only if multiple operating systems or secret templating make the bare Git approach too cumbersome.

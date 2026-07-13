@@ -114,27 +114,26 @@ if [ -f "$HOME/.config/dotfiles/shell/dotfiles.sh" ]; then
   . "$HOME/.config/dotfiles/shell/dotfiles.sh"
 fi
 
-use-work() {
-  echo work > "$HOME/.dotfiles-profile"
-  export DOTFILES_PROFILE=work
-  source "$HOME/.bashrc"
-}
+# Machine-specific configuration
+DOTFILES_MACHINE="$(
+  /usr/bin/git \
+    --git-dir="$HOME/.dotfiles" \
+    config --local --get dotfiles.machine 2>/dev/null || true
+)"
 
-# detect profile
-if [ -f "$HOME/.dotfiles-profile" ]; then
-  read -r DOTFILES_PROFILE < "$HOME/.dotfiles-profile"
-else
-  DOTFILES_PROFILE="work"
-fi
-
-export DOTFILES_PROFILE
-
-# load profile-specific file and load its environment-specific additions
-case "$DOTFILES_PROFILE" in
+case "$DOTFILES_MACHINE" in
   work)
     [ -f "$HOME/.bashrc.work" ] && . "$HOME/.bashrc.work"
     ;;
+  personal|"")
+    ;;
+  *)
+    printf 'Warning: unknown dotfiles machine type: %s\n' \
+      "$DOTFILES_MACHINE" >&2
+    ;;
 esac
+
+export DOTFILES_MACHINE
 
 ####################### VSCODE OPS #######################
 
