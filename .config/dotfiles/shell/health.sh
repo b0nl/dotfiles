@@ -204,4 +204,42 @@ dotfiles-health() {
   if [ "$found_bootstrap_script" = false ]; then
     health_missing "no bootstrap install scripts found"
   fi
+
+  health_section "NZBridge"
+
+  if [ -r "$HOME/.local/share/nzbridge/version" ]; then
+      health_ok \
+          "NZBridge assets prepared: v$(cat "$HOME/.local/share/nzbridge/version")"
+  else
+      health_missing "NZBridge prepared version"
+      health_warn "Run: ~/bootstrap/install-nzbridge.sh"
+  fi
+
+  if [ -f "$HOME/.local/share/nzbridge/nz-bridge.xpi" ]; then
+      health_ok "NZBridge Zotero plugin installer is available"
+  else
+      health_missing "$HOME/.local/share/nzbridge/nz-bridge.xpi"
+  fi
+
+  if [ -f "$HOME/.local/share/nzbridge/browser-extension/manifest.json" ]; then
+      health_ok "NZBridge browser extension files are available"
+  else
+      health_missing \
+          "$HOME/.local/share/nzbridge/browser-extension/manifest.json"
+  fi
+
+  if curl \
+      --fail \
+      --silent \
+      --show-error \
+      --max-time 2 \
+      --header "Zotero-Allowed-Request: true" \
+      "http://localhost:23119/n2z/status" \
+      >/dev/null 2>&1
+  then
+      health_ok "NZBridge Zotero endpoint is reachable"
+  else
+      health_warn \
+          "NZBridge endpoint is unavailable; start Zotero and verify the plugin"
+  fi
 }
