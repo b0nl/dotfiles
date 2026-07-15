@@ -961,94 +961,75 @@ Potential future work:
 
 -----------------------------
 
-# Miscellaneous Things
+# Miscellaneous
 
-### `install-zotero.sh`
+### Zotero
 
-Installs Zotero from the Debian/Ubuntu-compatible Zotero apt repository.
-
-It:
-
-* configures the repository signing key;
-* adds the Zotero apt source;
-* installs Zotero through apt;
-* allows Zotero to receive updates through the normal system package upgrade process.
-
-Run it independently with:
+Zotero is installed through a dedicated bootstrap script:
 
 ```bash
 ~/bootstrap/install-zotero.sh
 ```
 
-Zotero account authentication and library synchronization remain manual. After installation:
+The installer configures the Zotero apt repository and installs Zotero through apt so it receives normal system updates.
 
-1. Open Zotero.
-2. Go to **Edit → Settings → Sync**.
-3. Sign in with the same Zotero account used for the online library.
-4. Enable automatic data and attachment syncing.
-5. Run the initial sync.
+After installation, open Zotero and sign in under:
 
-Zotero stores local application and research-library state under paths such as:
+```text
+Edit → Settings → Sync
+```
+
+Use the same Zotero account as the web library to synchronize collections, references, notes, and attachments.
+
+Zotero’s local library and application state must remain untracked:
 
 ```text
 ~/.zotero/
 ~/Zotero/
 ```
 
-These directories may contain the Zotero database, PDFs, attachments, notes, logs, translators, styles, and account state. They must remain untracked.
+These directories may contain databases, PDFs, attachments, notes, logs, and account state.
 
-Do not place the active Zotero database inside a general filesystem-sync directory such as Dropbox, Google Drive, or OneDrive. Use Zotero Sync for the active library and a separate backup process for recovery.
+Do not store the active Zotero database inside Dropbox, Google Drive, OneDrive, or another general filesystem-sync directory. Use Zotero Sync for library synchronization.
 
-### `install-nzbridge.sh`
+### Zotero and NotebookLM with NZBridge
 
-Prepares [NZBridge](https://github.com/Rafael-Silva-Oliveira/NZBridge), which provides bidirectional research transfer between Zotero and Google NotebookLM.
+[NZBridge](https://github.com/Rafael-Silva-Oliveira/NZBridge) provides bidirectional transfer between Zotero and Google NotebookLM.
 
-NZBridge has two components:
+It consists of:
 
-* a Zotero plugin that exposes collections and items through a local Zotero endpoint;
-* a Chrome or Edge extension that transfers sources and saved notes between Zotero and NotebookLM.
+* a Zotero plugin;
+* an unpacked Chrome or Edge extension.
 
-The installer:
-
-* downloads the NZBridge Zotero plugin;
-* downloads and extracts the browser extension;
-* verifies the published SHA-256 checksums;
-* stores the prepared files under:
-
-```text
-~/.local/share/nzbridge/
-```
-
-Run it independently with:
+Prepare both components with:
 
 ```bash
 ~/bootstrap/install-nzbridge.sh
 ```
 
-The installer prepares the files but cannot complete the browser and Zotero UI steps automatically.
-
-#### One-time Zotero setup
-
-Open Zotero and select:
+The downloaded files are stored under:
 
 ```text
-Tools
-└── Plugins
-    └── gear icon
-        └── Install Plugin From File
+~/.local/share/nzbridge/
 ```
 
-Choose:
+#### Zotero plugin setup
+
+In Zotero, open:
+
+```text
+Tools → Plugins → gear icon → Install Plugin From File
+```
+
+Select:
 
 ```text
 ~/.local/share/nzbridge/nz-bridge.xpi
 ```
 
-Restart Zotero if prompted.
+Restart Zotero if requested.
 
-The NZBridge local endpoint is available only while Zotero is running and the plugin is enabled.
-
-#### One-time Chrome setup
+#### Browser extension setup
 
 Open:
 
@@ -1067,22 +1048,15 @@ Then:
 ```
 
 4. Pin NZBridge to the browser toolbar.
+5. Open the extension’s site settings and allow local-network access if Chrome requests it.
 
-On Chrome or Edge 142 and later, also open the NZBridge extension details and configure:
-
-```text
-Site settings
-└── Local network access
-    └── Allow
-```
-
-NotebookLM must currently use English as its interface language for NZBridge automation.
+Zotero must be running for the browser extension to communicate with the NZBridge plugin.
 
 #### Research workflow
 
-Zotero should remain the canonical research library. NotebookLM is the analysis and synthesis layer.
+Zotero remains the canonical research library. NotebookLM is used for analysis, synthesis, and exploratory questioning.
 
-A recommended project structure is:
+A typical flow is:
 
 ```text
 Zotero collection
@@ -1091,31 +1065,25 @@ NotebookLM notebook
         ↓
 Saved NotebookLM notes
         ↓
-Imported Zotero document and child note
+Imported back into Zotero
 ```
 
 For Zotero to NotebookLM:
 
-1. Create a Zotero collection for the research project.
-2. Add the relevant papers, PDFs, URLs, metadata, and notes.
-3. Create or open the matching NotebookLM notebook.
-4. Open NZBridge.
-5. Select the Zotero collection in the **To NotebookLM** tab.
-6. Review the selected PDFs and URLs.
-7. Start the sync.
-
-NZBridge can upload local PDF attachments, transfer suitable URLs, skip previously synchronized items, and associate a Zotero collection with a NotebookLM notebook.
+1. Create a Zotero collection for the project.
+2. Add papers, PDFs, URLs, and metadata.
+3. Open the corresponding NotebookLM notebook.
+4. Use NZBridge’s **To NotebookLM** tab to transfer the sources.
 
 For NotebookLM to Zotero:
 
-1. Save useful NotebookLM output as a Studio note.
+1. Save useful NotebookLM output as a note.
 2. Open NZBridge’s **To Zotero** tab.
 3. Select the originating Zotero collection.
-4. Add useful project or provenance tags.
-5. Select the notes to preserve.
-6. Import them into Zotero.
+4. Import the saved notes.
+5. Add provenance and review tags where useful.
 
-Suggested tags include:
+Example tags:
 
 ```text
 origin:notebooklm
@@ -1123,48 +1091,7 @@ status:needs-review
 project:<project-name>
 ```
 
-NZBridge imports saved NotebookLM notes, not the complete disposable chat history. Important claims must still be checked against the original source before being cited or published.
-
-The NotebookLM notebook URL and imported-note metadata provide workflow provenance, but they do not guarantee a structured citation link from every generated statement to an individual Zotero item.
-
-### Zotero and NZBridge bootstrap order
-
-The complete bootstrap order is:
-
-```text
-install-dotfiles.sh
-install-apt.sh
-install-snap.sh
-install-uv.sh
-install-docker.sh
-install-zotero.sh
-install-nzbridge.sh
-install-vscode.sh
-install-gnome.sh
-```
-
-Zotero is installed before NZBridge because NZBridge’s Zotero component requires Zotero.
-
-### Zotero and NZBridge health checks
-
-The health check should verify:
-
-* that the `zotero` command is available;
-* that the NZBridge version file exists;
-* that the downloaded Zotero plugin file exists;
-* that the unpacked browser extension contains `manifest.json`;
-* that the NZBridge Zotero endpoint responds while Zotero is running.
-
-Run:
-
-```bash
-source ~/.bashrc
-dotfiles-health
-```
-
-An unavailable NZBridge endpoint is only a warning when Zotero is closed. Start Zotero before diagnosing the plugin installation.
-
-### Zotero and NZBridge local state
+Imported NotebookLM content should be treated as research notes, not as an authoritative citation source. Verify important claims against the original Zotero items before citing or publishing them.
 
 Do not track:
 
@@ -1174,13 +1101,4 @@ Do not track:
 ~/.local/share/nzbridge/
 ```
 
-Also do not track:
-
-* Zotero account credentials;
-* Zotero databases or attachments;
-* Google account cookies or browser sessions;
-* Chrome or Edge profiles;
-* NZBridge collection-to-notebook mappings stored in browser state;
-* NotebookLM authentication state.
-
-The bootstrap tracks only the installer and reproducible configuration logic. Application data, credentials, research content, and browser state remain local or are synchronized through their respective services.
+Also keep Zotero credentials, Google sessions, browser profiles, NotebookLM authentication state, and research-library data outside the dotfiles repository.
