@@ -146,3 +146,4 @@ fi
 if [ -f "$HOME/.config/dotfiles/shell/health.sh" ]; then
   . "$HOME/.config/dotfiles/shell/health.sh"
 fi
+. "$HOME/.local/bin/env"
