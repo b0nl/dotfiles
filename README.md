@@ -963,6 +963,39 @@ Potential future work:
 
 # Miscellaneous
 
+### Xpad
+
+Xpad provides lightweight desktop sticky notes similar to Windows Sticky Notes.
+
+It is installed through the base apt package manifest:
+
+```text
+~/.config/dotfiles/packages/apt-base.txt
+```
+
+Launch it from the application menu or run:
+
+```bash
+xpad
+```
+
+Useful commands include:
+
+```bash
+xpad --new
+xpad --show
+xpad --toggle
+xpad --quit
+```
+
+Xpad stores notes and local application state under:
+
+```text
+~/.config/xpad/
+```
+
+This directory must remain untracked because it may contain private notes and machine-specific state. Xpad should be treated as a local scratch-note application rather than a synchronized or version-controlled knowledge store.
+
 ### Zotero
 
 Zotero is installed through a dedicated bootstrap script:

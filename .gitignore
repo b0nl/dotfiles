@@ -32,3 +32,5 @@
 # Zotero profile, database, attachments, and local state
 .zotero/
 Zotero/
+# Xpad local notes and state
+.config/xpad/
