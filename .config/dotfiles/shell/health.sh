@@ -173,6 +173,23 @@ dotfiles-health() {
     fi
   fi
 
+  if [ "$machine" = "personal" ]; then
+    health_section "Personal setup"
+
+    if command -v ledger-wallet >/dev/null 2>&1; then
+      health_ok "ledger-wallet -> $(command -v ledger-wallet)"
+    else
+      health_missing "ledger-wallet"
+      health_warn "Run: ~/bootstrap/install-ledger-wallet.sh"
+    fi
+
+    if [ -r /etc/udev/rules.d/20-ledger.rules ]; then
+      health_ok "Ledger USB rules installed"
+    else
+      health_missing "/etc/udev/rules.d/20-ledger.rules"
+    fi
+  fi
+
   health_section "VSCode config"
 
   for file in \

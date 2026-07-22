@@ -34,3 +34,10 @@
 Zotero/
 # Xpad local notes and state
 .config/xpad/
+
+# Ledger Wallet / Ledger Live
+.local/opt/ledger-wallet/
+.local/bin/ledger-wallet
+.config/Ledger Live/
+.config/Ledger Wallet/
+.config/ledger-live-desktop/

@@ -963,6 +963,36 @@ Potential future work:
 
 # Miscellaneous
 
+### Ledger Wallet
+
+Ledger Wallet, formerly Ledger Live, is installed on personal machines through:
+
+    ~/bootstrap/install-ledger-wallet.sh
+
+The installer:
+
+- downloads the current official Linux AppImage;
+- installs it under `~/.local/opt/ledger-wallet/`;
+- creates the `ledger-wallet` command under `~/.local/bin/`;
+- creates a desktop application entry;
+- installs the Linux USB rules required for Ledger hardware devices;
+- skips work machines automatically.
+
+Launch it from the application menu or run:
+
+    ledger-wallet
+
+Rerunning the installer replaces the installed AppImage with the current
+official Linux release.
+
+The downloaded binary's SHA-512 hash is printed during installation. It can
+be checked against Ledger's official download-signatures page before first
+launch.
+
+Ledger application data and account metadata must remain untracked. Never
+store a PIN, recovery phrase, private key, account export, or screenshot of a
+recovery phrase in the dotfiles repository.
+
 ### Xpad
 
 Xpad provides lightweight desktop sticky notes similar to Windows Sticky Notes.
