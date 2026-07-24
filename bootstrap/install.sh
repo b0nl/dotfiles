@@ -63,6 +63,7 @@ echo "==> Machine type: $DOTFILES_MACHINE"
 "$SCRIPT_DIR/install-zotero.sh"
 "$SCRIPT_DIR/install-nzbridge.sh"
 "$SCRIPT_DIR/install-vscode.sh"
+"$SCRIPT_DIR/install-gnome-extensions.sh"
 "$SCRIPT_DIR/install-gnome.sh"
 
 echo "==> Full install complete"

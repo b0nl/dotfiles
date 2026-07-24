@@ -4,6 +4,7 @@ direnv
 ffmpeg
 fzf
 git
+gnome-shell-extension-manager
 htop
 nodejs
 pacman

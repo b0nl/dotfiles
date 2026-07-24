@@ -42,5 +42,11 @@ dump_dconf \
   "$GNOME_DIR/configs/media-keys.dconf" \
   "GNOME media/custom keybindings"
 
+tiling_shell_save="$GNOME_DIR/tiling-shell/save.sh"
+
+if [[ -x "$tiling_shell_save" ]]; then
+    "$tiling_shell_save"
+fi
+
 echo
 echo "==> GNOME settings saved"

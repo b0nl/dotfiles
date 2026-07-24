@@ -46,6 +46,12 @@ load_dconf \
   "$GNOME_DIR/configs/media-keys.dconf" \
   "GNOME media/custom keybindings"
 
+tiling_shell_apply="$GNOME_DIR/tiling-shell/apply.sh"
+
+if [[ -x "$tiling_shell_apply" ]]; then
+    "$tiling_shell_apply"
+fi
+
 echo
 echo "==> GNOME settings applied"
 echo "==> You may need to log out/in or restart GNOME apps to see every change."
