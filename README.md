@@ -1115,6 +1115,56 @@ Then:
 
 Zotero must be running for the browser extension to communicate with the NZBridge plugin.
 
+#### Updating NZBridge
+
+Run the installer to download and prepare the latest NZBridge release:
+
+```bash
+~/bootstrap/install-nzbridge.sh
+```
+
+The installer updates both the Zotero plugin and the unpacked browser-extension files under:
+
+```text
+~/.local/share/nzbridge/
+```
+
+After the update:
+
+1. Open `chrome://extensions` or `edge://extensions`.
+2. Find NZBridge.
+3. Click **Reload**.
+
+You normally do not need to select **Load unpacked** again because the installer keeps the extension at the same path:
+
+```text
+~/.local/share/nzbridge/browser-extension/
+```
+
+To update the Zotero plugin, open Zotero and reinstall:
+
+```text
+~/.local/share/nzbridge/nz-bridge.xpi
+```
+
+using:
+
+```text
+Tools → Plugins → gear icon → Install Plugin From File
+```
+
+Check for an available update without installing it:
+
+```bash
+~/bootstrap/install-nzbridge.sh --check
+```
+
+Force a fresh reinstall:
+
+```bash
+~/bootstrap/install-nzbridge.sh --force
+```
+
 #### Research workflow
 
 Zotero remains the canonical research library. NotebookLM is used for analysis, synthesis, and exploratory questioning.
@@ -1137,6 +1187,8 @@ For Zotero to NotebookLM:
 2. Add papers, PDFs, URLs, and metadata.
 3. Open the corresponding NotebookLM notebook.
 4. Use NZBridge’s **To NotebookLM** tab to transfer the sources.
+
+Note that PDFs will not show up on the browser extension unless their metadata (eg. author, etc.) is retrieved and attached to the PDF in Zotero.
 
 For NotebookLM to Zotero:
 
