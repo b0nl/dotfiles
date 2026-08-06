@@ -74,5 +74,8 @@
         "promptDelete": "backspace"
     },
     "todo-tree.ripgrep.ripgrep": "/usr/bin/rg",
-    "redhat.telemetry.enabled": false
+    "redhat.telemetry.enabled": false,
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    }
 }

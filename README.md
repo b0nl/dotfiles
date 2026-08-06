@@ -59,6 +59,7 @@ dotfiles push
 |   ├── install-zotero.sh
 |   └── install-nzbridge.sh
 │   ├── install-vscode.sh
+│   ├── install-gnome-extensions.sh
 │   └── install-gnome.sh
 └── .config/
     ├── Code/
@@ -73,10 +74,11 @@ dotfiles push
         ├── gnome/
         │   ├── save.sh
         │   ├── apply.sh
-        │   └── terminal/
-        │       ├── profiles.dconf
+        │   ├── configs/
+        │   └── tiling-shell/
         │       ├── save.sh
-        │       └── apply.sh
+        │       ├── apply.sh
+        │       └── layouts.json
         ├── packages/
         │   ├── apt-base.txt
         │   ├── apt-work.txt
@@ -261,6 +263,7 @@ install-snap.sh
 install-uv.sh
 install-docker.sh
 install-vscode.sh
+install-gnome-extensions.sh
 install-gnome.sh
 ```
 
@@ -684,6 +687,89 @@ GNOME Terminal profiles are stored beneath:
 ```
 
 The restore process must remain guarded and should not run on headless machines.
+
+### Tiling Shell
+
+Tiling Shell provides reusable custom window grids for GNOME.
+
+The installation flow consists of:
+
+1. `install-apt.sh` installing the Extension Manager package from the base apt manifest;
+2. `install-gnome-extensions.sh` installing and enabling Tiling Shell;
+3. disabling Ubuntu's bundled Tiling Assistant extension to prevent both tiling systems from handling the same window snapping events;
+4. `install-gnome.sh` restoring the tracked Tiling Shell layouts.
+
+The relevant extension UUIDs are:
+
+```text
+tilingshell@ferrarodomenico.com
+tiling-assistant@ubuntu.com
+```
+
+Only Tiling Shell should remain enabled:
+
+```bash
+gnome-extensions list --enabled | grep -i tiling
+```
+
+Expected result:
+
+```text
+tilingshell@ferrarodomenico.com
+```
+
+If Ubuntu's Tiling Assistant is still enabled, disable it with:
+
+```bash
+gnome-extensions disable tiling-assistant@ubuntu.com
+gnome-extensions enable tilingshell@ferrarodomenico.com
+```
+
+A logout and login may be required after installing or changing GNOME Shell extensions.
+
+#### Tracked layouts
+
+Tiling Shell stores its reusable layout definitions in a dconf value. The dotfiles setup exports that value to a readable JSON file:
+
+```text
+~/.config/dotfiles/gnome/tiling-shell/layouts.json
+```
+
+The supporting scripts are:
+
+```text
+~/.config/dotfiles/gnome/tiling-shell/save.sh
+~/.config/dotfiles/gnome/tiling-shell/apply.sh
+```
+
+Save the current Tiling Shell layouts with:
+
+```bash
+~/.config/dotfiles/gnome/tiling-shell/save.sh
+```
+
+Restore the tracked layouts with:
+
+```bash
+~/.config/dotfiles/gnome/tiling-shell/apply.sh
+```
+
+The central GNOME helpers invoke these scripts automatically. To save all tracked GNOME settings, including Tiling Shell layouts, run:
+
+```bash
+~/.config/dotfiles/gnome/save.sh
+```
+
+To restore all tracked GNOME settings:
+
+```bash
+~/.config/dotfiles/gnome/apply.sh
+```
+
+The layout JSON may contain several layouts. Saving the layouts again replaces the tracked JSON with the current Tiling Shell configuration.
+
+Tiling Shell restores window-grid definitions only. It does not automatically launch applications or associate specific applications with particular tiles.
+
 
 ## Health check
 
