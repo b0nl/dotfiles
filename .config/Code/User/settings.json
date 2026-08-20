@@ -2,7 +2,14 @@
     "workbench.editor.sharedViewState": true,
     "python.languageServer": "Pylance",
     "github.copilot.selectedCompletionModel": "",
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false
+    },
     "github.copilot.nextEditSuggestions.enabled": true,
+    "editor.inlineSuggest.enabled": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "chat.viewSessions.orientation": "stacked",
     "claudeCode.preferredLocation": "panel",
@@ -59,8 +66,6 @@
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
-    "gitlens.ai.model": "vscode",
-    "gitlens.ai.vscode.model": "copilotcli:claude-sonnet-4.6",
     "codeTelescope.preview.showLineNumbers": true,
     "codeTelescope.keybindings": {
         "moveDown": "ctrl+j",
@@ -77,5 +82,9 @@
     "redhat.telemetry.enabled": false,
     "[json]": {
         "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[csv]": {
+        "editor.inlayHints.maximumLength": 0,
+        "editor.inlayHints.padding": ""
     }
 }

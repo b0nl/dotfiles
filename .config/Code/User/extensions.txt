@@ -4,11 +4,11 @@ eamodio.gitlens
 github.remotehub
 gruntfuggly.todo-tree
 guichina.code-telescope
-janisdd.vscode-edit-csv
 jinsihou.diff-tool
 johnpapa.vscode-peacock
 joshmu.periscope
 l13rary.l13-diff
+mechatroner.rainbow-csv
 ms-azuretools.vscode-containers
 ms-python.debugpy
 ms-python.python
@@ -30,7 +30,6 @@ ms-vscode-remote.remote-containers
 ms-vscode-remote.remote-ssh
 ms-vscode-remote.remote-ssh-edit
 ms-vscode.remote-repositories
-njpwerner.autodocstring
 redhat.vscode-yaml
 sleistner.vscode-fileutils
 streetsidesoftware.code-spell-checker
