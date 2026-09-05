@@ -3,7 +3,6 @@ charliermarsh.ruff
 eamodio.gitlens
 github.remotehub
 gruntfuggly.todo-tree
-guichina.code-telescope
 jinsihou.diff-tool
 johnpapa.vscode-peacock
 joshmu.periscope

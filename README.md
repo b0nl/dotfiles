@@ -56,11 +56,13 @@ dotfiles push
 │   ├── install-snap.sh
 │   ├── install-uv.sh
 │   ├── install-docker.sh
-|   ├── install-zotero.sh
-|   └── install-nzbridge.sh
+│   ├── install-zotero.sh
+│   ├── install-nzbridge.sh
 │   ├── install-vscode.sh
 │   ├── install-gnome-extensions.sh
-│   └── install-gnome.sh
+│   ├── install-gnome.sh
+│   ├── install-proton-authenticator.sh
+│   └── install-ledger-wallet.sh
 └── .config/
     ├── Code/
     │   └── User/
@@ -89,7 +91,8 @@ dotfiles push
         └── shell/
             ├── dotfiles.sh
             ├── vscode.sh
-            └── health.sh
+            ├── health.sh
+            └── update.sh
 ```
 
 GNOME Terminal configuration belongs under:
@@ -1033,6 +1036,91 @@ dotfiles add .
 dotfiles add -A
 ```
 
+## Dotfiles update audit
+
+The update helper lives at:
+
+```text
+~/.config/dotfiles/shell/update.sh
+```
+
+and is loaded by `.bashrc`.
+
+It provides two main commands:
+
+```bash
+dotfiles-update-check
+dotfiles-update-snapshots
+```
+
+### Checking for configuration drift
+
+Run:
+
+```bash
+dotfiles-update-check
+```
+
+to check whether the current workstation has drifted from the configuration recorded in the dotfiles repository.
+
+The audit checks:
+
+* tracked dotfiles with local modifications;
+* whether the local Git branch is ahead of or behind its remote;
+* installed VSCode extensions against `~/.config/Code/User/extensions.txt`;
+* tracked GNOME configuration against the current desktop configuration;
+* Tiling Shell layouts;
+* bootstrap installers that are not called by `bootstrap/install.sh`;
+* bootstrap installers and shell helpers that are missing from the README;
+* shell helpers under `~/.config/dotfiles/shell/` that are not sourced by `.bashrc`;
+* the local `dotfiles.machine` configuration.
+
+The check does not rewrite tracked configuration. It may run `git fetch` so that local and remote Git state can be compared.
+
+A typical check is:
+
+```bash
+dotfiles-update-check
+dotfiles status -sb
+```
+
+### Refreshing generated snapshots
+
+When the audit reports that generated configuration has changed, run:
+
+```bash
+dotfiles-update-snapshots
+```
+
+This refreshes configuration that can safely be reproduced from the current workstation, including:
+
+* the VSCode extension list;
+* GNOME/dconf configuration;
+* Tiling Shell layouts.
+
+Package manifests are intentionally excluded. The apt and Snap manifests remain curated desired-state files rather than snapshots of everything currently installed.
+
+`dotfiles-update-snapshots` does not stage, commit, or push changes.
+
+Review the result first:
+
+```bash
+dotfiles status -sb
+dotfiles diff
+```
+
+Then stage only the intended tracked changes:
+
+```bash
+dotfiles add -u
+dotfiles diff --cached
+dotfiles commit -m "Update workstation configuration"
+dotfiles push
+```
+
+For newly created files, add them explicitly rather than using `dotfiles add .` or `dotfiles add -A`.
+
+
 ## Deferred improvements
 
 Potential future work:
@@ -1303,3 +1391,36 @@ Do not track:
 ```
 
 Also keep Zotero credentials, Google sessions, browser profiles, NotebookLM authentication state, and research-library data outside the dotfiles repository.
+
+### Proton Authenticator
+
+Proton Authenticator is installed through:
+
+```bash
+~/bootstrap/install-proton-authenticator.sh
+```
+
+The installer:
+
+* fetches the current Proton Authenticator Linux release metadata;
+* selects the official Ubuntu/Debian `.deb` package;
+* verifies the downloaded package against Proton's published SHA-512 checksum;
+* installs it using `apt`;
+* does nothing when the current package version is already installed;
+* skips installation on unsupported architectures.
+
+The installer is also run automatically as part of the normal workstation bootstrap:
+
+```bash
+~/bootstrap/install.sh
+```
+
+To manually install or update Proton Authenticator later, rerun:
+
+```bash
+~/bootstrap/install-proton-authenticator.sh
+```
+
+The script checks Proton's current release metadata each time, so rerunning it installs a newer version when one is available.
+
+Authenticator accounts, MFA secrets, recovery information, and local application state must not be added to the dotfiles repository.

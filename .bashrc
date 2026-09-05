@@ -146,3 +146,9 @@ fi
 if [ -f "$HOME/.config/dotfiles/shell/health.sh" ]; then
   . "$HOME/.config/dotfiles/shell/health.sh"
 fi
+
+####################### UPDATE OPS #######################
+
+if [ -f "$HOME/.config/dotfiles/shell/update.sh" ]; then
+    . "$HOME/.config/dotfiles/shell/update.sh"
+fi
