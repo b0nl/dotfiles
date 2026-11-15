@@ -404,11 +404,17 @@ Membership in the `docker` group grants effectively root-level control over the 
 
 ### `install-vscode.sh`
 
-Installs extensions listed in:
+Installs VSCode from Microsoft's latest stable Debian package when the `code`
+command is unavailable, enabling Microsoft's APT repository for future updates.
+Existing installations are preserved.
+
+Then installs extensions listed in:
 
 ```text
 ~/.config/Code/User/extensions.txt
 ```
+
+VSCode is managed by this installer rather than the general package manifests.
 
 ### `install-gnome.sh`
 

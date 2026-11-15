@@ -1,4 +1,2 @@
-chromium-browser
-code --classic
+chromium
 spotify
-vlc
