@@ -86,5 +86,6 @@
     "[csv]": {
         "editor.inlayHints.maximumLength": 0,
         "editor.inlayHints.padding": ""
-    }
+    },
+    "claudeCode.hideOnboarding": true
 }
