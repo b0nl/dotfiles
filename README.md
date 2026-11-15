@@ -58,6 +58,7 @@ dotfiles push
 │   ├── install-docker.sh
 │   ├── install-zotero.sh
 │   ├── install-nzbridge.sh
+│   ├── install-codex.sh
 │   ├── install-vscode.sh
 │   ├── install-gnome-extensions.sh
 │   ├── install-gnome.sh
@@ -269,6 +270,7 @@ install-uv.sh
 install-docker.sh
 install-zotero.sh
 install-nzbridge.sh
+install-codex.sh
 install-vscode.sh
 install-gnome-extensions.sh
 install-gnome.sh
@@ -411,6 +413,28 @@ id -nG | tr ' ' '\n' | grep -x docker
 ```
 
 Membership in the `docker` group grants effectively root-level control over the machine.
+
+### `install-codex.sh`
+
+Installs or updates Codex CLI using OpenAI's official standalone installer.
+It runs on both work and personal machines.
+
+To install or update:
+
+```bash
+~/bootstrap/install-codex.sh
+```
+
+After installation, authenticate interactively:
+
+```bash
+codex login
+```
+
+Sign in with the ChatGPT account associated with your subscription.
+
+Codex runtime files, credentials, and session history under `~/.codex/`,
+together with its generated launchers, remain untracked.
 
 ### `install-vscode.sh`
 
@@ -809,7 +833,7 @@ The health check verifies:
 - the `dotfiles` function;
 - dotfiles Git status;
 - the local `dotfiles.machine` value;
-- core commands such as `git`, `curl`, `uv`, `code`, and `zotero`;
+- core commands such as `git`, `curl`, `uv`, `codex`, `code`, and `zotero`;
 - Docker installation;
 - Docker group membership;
 - whether the Docker group is active in the current shell;
