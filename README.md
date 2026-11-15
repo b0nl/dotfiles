@@ -48,6 +48,7 @@ dotfiles push
 ├── .gitignore_global
 ├── .profile
 ├── .tmux.conf
+├── AGENTS.md
 ├── README.md
 ├── bootstrap/
 │   ├── install.sh
@@ -684,6 +685,21 @@ Meaning:
 `.gitignore` applies to the bare dotfiles repository's home-directory work tree.
 
 `.gitignore_global` applies to every normal Git repository on the machine.
+
+## Agent guidance
+
+[AGENTS.md](AGENTS.md) contains Steward's repository-specific agent guidance.
+
+For the installed bare repository, start Codex at its home-directory worktree:
+
+```bash
+codex --cd "$HOME"
+```
+
+For Steward work in the desktop app or IDE extension, use `$HOME` as the
+project or working folder. In an ordinary clone, use that checkout's root.
+
+Start a new Codex session after changing instruction files.
 
 ## VSCode
 
