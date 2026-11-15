@@ -46,3 +46,6 @@ Zotero/
 .codex/
 .local/bin/codex
 .local/bin/codex-code-mode-host
+
+# ChatGPT desktop / Codex local profile
+.config/Codex/

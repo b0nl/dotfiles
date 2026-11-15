@@ -59,6 +59,7 @@ dotfiles push
 │   ├── install-zotero.sh
 │   ├── install-nzbridge.sh
 │   ├── install-codex.sh
+│   ├── install-chatgpt.sh
 │   ├── install-vscode.sh
 │   ├── install-gnome-extensions.sh
 │   ├── install-gnome.sh
@@ -271,6 +272,7 @@ install-docker.sh
 install-zotero.sh
 install-nzbridge.sh
 install-codex.sh
+install-chatgpt.sh
 install-vscode.sh
 install-gnome-extensions.sh
 install-gnome.sh
@@ -435,6 +437,29 @@ Sign in with the ChatGPT account associated with your subscription.
 
 Codex runtime files, credentials, and session history under `~/.codex/`,
 together with its generated launchers, remain untracked.
+
+### `install-chatgpt.sh`
+
+Installs the official ChatGPT Linux desktop app, including the Codex coding
+interface, when the `chatgpt` package is missing. Existing installations are
+preserved.
+
+Run:
+
+```bash
+~/bootstrap/install-chatgpt.sh
+```
+
+The initial installation configures OpenAI's signed APT repository.
+Subsequent updates use APT:
+
+```bash
+sudo apt update
+sudo apt install --only-upgrade chatgpt
+```
+
+Open ChatGPT and select Codex for development work.
+Keep the desktop profile directory `~/.config/Codex/` untracked.
 
 ### `install-vscode.sh`
 
@@ -706,6 +731,14 @@ A reasonable global baseline is:
 }
 ```
 
+### Codex
+
+The Codex extension (`openai.chatgpt`) is included in `extensions.txt`
+and installed by `bootstrap/install-vscode.sh`.
+
+Open it through the Command Palette with `Codex: Open Codex Sidebar`.
+Sign in with the ChatGPT account associated with your subscription.
+
 ## GNOME configuration
 
 GNOME helpers live under:
@@ -833,7 +866,7 @@ The health check verifies:
 - the `dotfiles` function;
 - dotfiles Git status;
 - the local `dotfiles.machine` value;
-- core commands such as `git`, `curl`, `uv`, `codex`, `code`, and `zotero`;
+- core commands such as `git`, `curl`, `uv`, `codex`, `chatgpt`, `code`, and `zotero`;
 - Docker installation;
 - Docker group membership;
 - whether the Docker group is active in the current shell;
