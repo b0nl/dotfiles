@@ -95,10 +95,10 @@ dotfiles push
             └── update.sh
 ```
 
-GNOME Terminal configuration belongs under:
+GNOME Terminal profiles are saved to:
 
 ```text
-~/.config/dotfiles/gnome/terminal/
+~/.config/dotfiles/gnome/configs/profiles.dconf
 ```
 
 ## Fresh machine installation
@@ -263,8 +263,12 @@ It runs the individual installers in this order:
 install-dotfiles.sh
 install-apt.sh
 install-snap.sh
+install-proton-authenticator.sh
+install-ledger-wallet.sh
 install-uv.sh
 install-docker.sh
+install-zotero.sh
+install-nzbridge.sh
 install-vscode.sh
 install-gnome-extensions.sh
 install-gnome.sh
@@ -341,6 +345,12 @@ Verify the installation with:
 
 ```bash
 kubectl version --client
+```
+
+Snap normally updates installed applications automatically. To update kubectl manually:
+
+```bash
+sudo snap refresh kubectl
 ```
 
 Kubernetes credentials and cluster configuration under `~/.kube/` must remain untracked.
@@ -845,6 +855,8 @@ vscode-install-extensions
 vscode-edit-settings
 vscode-save-config
 dotfiles-health
+dotfiles-update-check
+dotfiles-update-snapshots
 ```
 
 If available:
